@@ -40,17 +40,19 @@ const handler = createHandler({
   hashSecret: Deno.env.get('RATE_LIMIT_SALT') || turnstileSecret,
   verifyTurnstile: (token, remoteIp, idempotencyKey) =>
     verifyTurnstileToken({ secret: turnstileSecret, token, remoteIp, allowedHostnames, idempotencyKey }),
-  joinWaitlist: async ({ email, referralSource, consentVersion, clientHash }) => {
-    const { data, error } = await getAdmin().rpc('waitlist_join', {
+  joinWaitlist: async ({ email, firstName, lastName, referralSource, consentVersion, clientHash }) => {
+    const { data, error } = await getAdmin().rpc('waitlist_join_v2', {
       p_email: email,
+      p_first_name: firstName,
+      p_last_name: lastName,
       p_referral_source: referralSource,
       p_consent_version: consentVersion,
       p_client_hash: clientHash,
     })
-    if (error) throw { code: error.code ?? 'rpc_error' } // never forward error.message/details: may contain the email
+    if (error) throw { code: error.code ?? 'rpc_error' } // never forward error.message/details: may contain personal data
     return data === 'rate_limited' ? 'rate_limited' : 'ok'
   },
-  // Logs contain event names and error codes only: no emails, IPs, tokens, or keys.
+  // Logs contain event names and error codes only: no names, emails, IPs, tokens, or keys.
   logError: (event, meta) => console.error(JSON.stringify({ event, ...meta })),
 })
 

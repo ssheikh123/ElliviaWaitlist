@@ -4,9 +4,10 @@
  */
 
 /** Bump this whenever the consent wording on the signup form changes. */
-export const CONSENT_VERSION = '2026-11-08-launch-notify-v1'
+export const CONSENT_VERSION = '2026-11-09-name-email-launch-notify-v2'
 
 export const MAX_EMAIL_LENGTH = 254
+export const MAX_NAME_LENGTH = 80
 
 /**
  * Referral sources accepted from `?ref=`. Anything else that is shaped like a slug
@@ -46,6 +47,21 @@ export function isValidEmail(normalized: string): boolean {
   return EMAIL_PATTERN.test(normalized)
 }
 
+/**
+ * Names: letters from any language plus spaces, apostrophes, hyphens and periods
+ * (O'Brien, Mary-Jane, José, Nguyễn, St. John). No digits, symbols, or markup.
+ */
+const NAME_PATTERN = /^[\p{L}\p{M}](?:[\p{L}\p{M}'’ .-]*[\p{L}\p{M}.])?$/u
+
+/** Unicode-normalizes, trims, and collapses inner whitespace. Keeps the person's casing. */
+export function normalizeName(raw: string): string {
+  return raw.normalize('NFKC').replace(/\s+/g, ' ').trim()
+}
+
+export function isValidName(normalized: string): boolean {
+  return normalized.length >= 1 && normalized.length <= MAX_NAME_LENGTH && NAME_PATTERN.test(normalized)
+}
+
 /** Returns a safe referral value, or null when the input is missing or malformed. */
 export function sanitizeReferral(raw: unknown): ReferralSource | null {
   if (typeof raw !== 'string') return null
@@ -59,6 +75,7 @@ export function sanitizeReferral(raw: unknown): ReferralSource | null {
 export type WaitlistErrorCode =
   | 'invalid_request'
   | 'invalid_email'
+  | 'invalid_name'
   | 'consent_required'
   | 'captcha_required'
   | 'captcha_failed'
@@ -71,6 +88,8 @@ export type WaitlistErrorCode =
 export type WaitlistResponse = { ok: true } | { ok: false; error: WaitlistErrorCode }
 
 export interface WaitlistRequestBody {
+  firstName: string
+  lastName: string
   email: string
   consent: boolean
   turnstileToken: string

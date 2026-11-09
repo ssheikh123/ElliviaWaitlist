@@ -30,7 +30,14 @@ function post(body: unknown, init: { origin?: string | null; apikey?: string | n
   })
 }
 
-const valid = { email: '  Jane.Doe+ER@Example.COM ', consent: true, turnstileToken: 'tok', referralSource: 'instagram' }
+const valid = {
+  firstName: '  Jane ',
+  lastName: "O'Brien-López",
+  email: '  Jane.Doe+ER@Example.COM ',
+  consent: true,
+  turnstileToken: 'tok',
+  referralSource: 'instagram',
+}
 
 describe('join-waitlist handler', () => {
   it('accepts a valid signup, normalizes the email and forwards the referral', async () => {
@@ -41,6 +48,8 @@ describe('join-waitlist handler', () => {
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN)
     expect(deps.joinWaitlist).toHaveBeenCalledWith({
       email: 'jane.doe+er@example.com',
+      firstName: 'Jane',
+      lastName: "O'Brien-López",
       referralSource: 'instagram',
       consentVersion: CONSENT_VERSION,
       clientHash: expect.stringMatching(/^[a-f0-9]{64}$/),
@@ -73,6 +82,30 @@ describe('join-waitlist handler', () => {
     expect(await res.json()).toEqual({ ok: false, error: 'invalid_email' })
     expect(deps.verifyTurnstile).not.toHaveBeenCalled()
     expect(deps.joinWaitlist).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    [{ firstName: '' }],
+    [{ lastName: '   ' }],
+    [{ firstName: undefined }],
+    [{ lastName: 42 }],
+    [{ firstName: '<script>' }],
+    [{ firstName: 'R2-D2' }],
+    [{ lastName: 'a@b.co' }],
+    [{ firstName: 'x'.repeat(81) }],
+  ])('rejects missing or invalid names %j before any captcha or database work', async (patch) => {
+    const { deps, handle } = setup()
+    const res = await handle(post({ ...valid, ...patch }))
+    expect(res.status).toBe(400)
+    expect(await res.json()).toEqual({ ok: false, error: 'invalid_name' })
+    expect(deps.verifyTurnstile).not.toHaveBeenCalled()
+    expect(deps.joinWaitlist).not.toHaveBeenCalled()
+  })
+
+  it.each([['José'], ['Nguyễn'], ['Mary Jane'], ['St. John'], ['李'], ['J']])('accepts the name %s', async (firstName) => {
+    const { deps, handle } = setup()
+    expect((await handle(post({ ...valid, firstName }))).status).toBe(200)
+    expect(vi.mocked(deps.joinWaitlist).mock.calls[0]![0].firstName).toBe(firstName)
   })
 
   it('rejects a non-string email', async () => {
@@ -154,7 +187,7 @@ describe('join-waitlist handler', () => {
     expect(res.status).toBe(500)
     expect(await res.json()).toEqual({ ok: false, error: 'server_error' })
     expect(logError).toHaveBeenCalledWith('waitlist_insert_failed', { code: '23514' })
-    expect(JSON.stringify(logError.mock.calls)).not.toMatch(/example\.com|203\.0\.113|tok/)
+    expect(JSON.stringify(logError.mock.calls)).not.toMatch(/example\.com|203\.0\.113|tok|Jane|Brien/)
   })
 
   describe('referral validation', () => {

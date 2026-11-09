@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react'
-import { Check, ChevronDown, ListChecks, ScanLine, Signpost, X, type LucideIcon } from 'lucide-react'
+import { ArrowDown, BadgeCheck, Check, ChevronDown, ListChecks, ScanLine, Signpost, X, type LucideIcon } from 'lucide-react'
 import { SignupForm } from './SignupForm.tsx'
+import { goToSignup } from '../lib/goToSignup.ts'
+import { LaunchPill } from './Nav.tsx'
 import { HeroBill } from './HeroBill.tsx'
 import { privacyHref } from '../config.ts'
 
@@ -17,12 +19,16 @@ export function Hero() {
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-40 -left-24 size-[420px] rounded-full bg-mint/70 blur-3xl"
       />
-      <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-center gap-10 px-4 pb-16 pt-10 sm:px-6 sm:pt-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:pb-24 lg:pt-20">
-        <div>
-          <p className="inline-flex max-w-full items-center gap-2 rounded-full bg-mint px-3.5 py-1.5 text-[14px] font-semibold text-ink ring-1 ring-ink/10">
-            <span aria-hidden="true" className="size-2 rounded-full bg-success" />
-            Free iOS app, planned for December 2026
-          </p>
+      <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-start gap-10 px-4 pb-16 pt-10 sm:px-6 sm:pt-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12 lg:pb-24 lg:pt-20">
+        <div className="lg:pt-24">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="inline-flex max-w-full items-center gap-2 rounded-full bg-mint px-3.5 py-1.5 text-[14px] font-semibold text-ink ring-1 ring-ink/10">
+              <span aria-hidden="true" className="size-2 rounded-full bg-success" />
+              Launching this December
+            </p>
+            {/* the nav hides this label on phones, so show it here instead */}
+            <LaunchPill className="inline-flex py-1.5 text-[13px] sm:hidden" />
+          </div>
           <h1
             id="hero-title"
             className="mt-6 max-w-[14ch] text-balance text-[44px] font-extrabold leading-[0.98] tracking-[-0.035em] text-ink [font-variation-settings:'wdth'_90] sm:text-[64px] lg:text-[72px]"
@@ -34,13 +40,39 @@ export function Hero() {
             soon to iOS.
           </p>
 
-          <div id="join" className="mt-8 max-w-xl scroll-mt-24 rounded-3xl bg-paper/85 p-4 shadow-soft ring-1 ring-line backdrop-blur sm:p-5">
-            <SignupForm placement="hero" />
-          </div>
+          <JoinCta />
         </div>
         <HeroBill />
       </div>
     </section>
+  )
+}
+
+function JoinCta() {
+  return (
+    <div className="mt-9">
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+        <a
+          href="#join"
+          onClick={goToSignup}
+          className="group inline-flex h-16 items-center gap-4 rounded-full bg-mint-2 pl-7 pr-2 text-[19px] font-bold text-ink shadow-paper ring-1 ring-ink/10 transition hover:bg-mint-3 active:scale-[0.98]"
+        >
+          Save my free spot
+          <span className="grid size-12 place-items-center rounded-full bg-ink text-white transition group-hover:translate-y-0.5">
+            <ArrowDown className="size-5" aria-hidden="true" />
+          </span>
+        </a>
+        <p className="-rotate-2 font-hand text-[25px] leading-none text-ink-2">It takes less than a minute!</p>
+      </div>
+      <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[15px] text-copy">
+        {['Free to download and use', 'Just your name and email', 'No medical info needed'].map((t) => (
+          <li key={t} className="flex items-center gap-1.5">
+            <BadgeCheck className="size-4 text-success" aria-hidden="true" />
+            {t}
+          </li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
@@ -171,7 +203,7 @@ function Story({ title, items, tone }: { title: string; items: string[]; tone: '
 /* -------------------------------------------------------- Trust & privacy */
 
 const receipt: { item: string; value: string; ok: boolean }[] = [
-  { item: 'Your email address', value: 'Yes', ok: true },
+  { item: 'Your name and email', value: 'Yes', ok: true },
   { item: 'Medical records', value: 'Never', ok: false },
   { item: 'Hospital bills', value: 'Never', ok: false },
   { item: 'Income or insurance details', value: 'Not here', ok: false },
@@ -179,7 +211,7 @@ const receipt: { item: string; value: string; ok: boolean }[] = [
 ]
 
 const promises: { title: string; body: string }[] = [
-  { title: 'Launch updates only', body: 'We use waitlist emails to tell you when Ellivia launches. We don’t sell them.' },
+  { title: 'Launch updates only', body: 'We use your name and email to tell you when Ellivia launches. We don’t sell them.' },
   {
     title: 'Independent from RUSH',
     body: 'Ellivia is an independent project and is not affiliated with RUSH University Medical Center.',
@@ -196,7 +228,7 @@ export function TrustPrivacy() {
       <div className="mx-auto grid max-w-6xl items-start gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16">
         <div>
           <h2 id="trust-title" className="max-w-[15ch] text-balance text-[34px] font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-[48px]">
-            Joining costs you one email address.
+            Joining takes just your name and email.
           </h2>
           <p className="mt-4 max-w-md text-lg leading-relaxed text-copy">
             Ellivia is free, and this website never asks for your medical or financial information.
@@ -266,10 +298,10 @@ const faqs: { q: string; a: ReactNode }[] = [
     a: 'Ellivia is planned for December 2026 on iOS. If you join the waitlist, we’ll email you when it’s available.',
   },
   {
-    q: 'What happens to my email?',
+    q: 'What happens to my name and email?',
     a: (
       <>
-        It’s used only for Ellivia launch updates, and you can ask us to delete it at any time. See the{' '}
+        They’re used only for Ellivia launch updates, and you can ask us to delete them at any time. See the{' '}
         <a href={privacyHref} className="font-semibold text-link underline underline-offset-2">
           privacy policy
         </a>
@@ -281,7 +313,7 @@ const faqs: { q: string; a: ReactNode }[] = [
 
 export function Faq() {
   return (
-    <section aria-labelledby="faq-title" className="px-4 py-20 sm:px-6 sm:py-28">
+    <section id="faq" aria-labelledby="faq-title" className="scroll-mt-16 px-4 py-20 sm:px-6 sm:py-28">
       <div className="mx-auto max-w-3xl">
         <h2 id="faq-title" className="text-[34px] font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-[48px]">
           Questions, answered.
@@ -316,7 +348,7 @@ function FaqItem({ q, children }: { q: string; children: ReactNode }) {
 
 export function FinalCta() {
   return (
-    <section aria-labelledby="final-title" className="px-4 pb-20 sm:px-6 sm:pb-28">
+    <section id="join" aria-labelledby="final-title" className="scroll-mt-20 px-4 pb-20 sm:px-6 sm:pb-28">
       <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[36px] bg-mint px-5 py-14 sm:px-12 sm:py-20">
         <div aria-hidden="true" className="sky-grid absolute inset-0 opacity-70" />
         {/* postmark */}
@@ -338,7 +370,7 @@ export function FinalCta() {
             Join the free waitlist and we’ll let you know when Ellivia is available on the App Store.
           </p>
           <div className="mt-9 rounded-3xl bg-paper p-5 text-left shadow-paper sm:p-6">
-            <SignupForm placement="footer" />
+            <SignupForm />
           </div>
         </div>
       </div>

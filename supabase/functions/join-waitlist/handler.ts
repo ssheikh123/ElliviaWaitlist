@@ -6,7 +6,9 @@
 import {
   CONSENT_VERSION,
   isValidEmail,
+  isValidName,
   normalizeEmail,
+  normalizeName,
   sanitizeReferral,
   type ReferralSource,
   type WaitlistErrorCode,
@@ -18,6 +20,8 @@ const MAX_TOKEN_LENGTH = 2048
 
 export interface JoinArgs {
   email: string
+  firstName: string
+  lastName: string
   referralSource: ReferralSource | null
   consentVersion: string
   clientHash: string
@@ -156,6 +160,13 @@ export function createHandler(deps: HandlerDeps) {
     if (!body || typeof body !== 'object' || Array.isArray(body)) return fail(origin, 400, 'invalid_request')
     const input = body as Record<string, unknown>
 
+    if (typeof input.firstName !== 'string' || typeof input.lastName !== 'string') {
+      return fail(origin, 400, 'invalid_name')
+    }
+    const firstName = normalizeName(input.firstName)
+    const lastName = normalizeName(input.lastName)
+    if (!isValidName(firstName) || !isValidName(lastName)) return fail(origin, 400, 'invalid_name')
+
     if (typeof input.email !== 'string') return fail(origin, 400, 'invalid_email')
     const email = normalizeEmail(input.email)
     if (!isValidEmail(email)) return fail(origin, 400, 'invalid_email')
@@ -182,7 +193,7 @@ export function createHandler(deps: HandlerDeps) {
 
     try {
       const clientHash = await hmacHex(`ellivia-rate-limit:${deps.hashSecret}`, ip ?? 'unknown')
-      const result = await deps.joinWaitlist({ email, referralSource, consentVersion: CONSENT_VERSION, clientHash })
+      const result = await deps.joinWaitlist({ email, firstName, lastName, referralSource, consentVersion: CONSENT_VERSION, clientHash })
       if (result === 'rate_limited') return fail(origin, 429, 'rate_limited')
       // Identical response whether the address was new or already present.
       return json(origin, 200, { ok: true })

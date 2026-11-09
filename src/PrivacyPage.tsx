@@ -4,7 +4,7 @@ import { Wordmark } from './components/Logo.tsx'
 import { Footer } from './components/Footer.tsx'
 import { config, homeHref } from './config.ts'
 
-export const PRIVACY_LAST_UPDATED = 'November 8, 2026'
+export const PRIVACY_LAST_UPDATED = 'November 9, 2026'
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -50,8 +50,8 @@ export default function PrivacyPage() {
 
         <p className="mt-8 text-lg leading-relaxed text-copy">
           This policy covers this prelaunch waitlist website only. It does not cover the future Ellivia iOS app, which
-          will have its own privacy policy. In short: we only ask for your email address, we only use it to tell you
-          about Ellivia’s launch, and you can ask us to delete it at any time.
+          will have its own privacy policy. In short: we only ask for your name and email address, we only use them to
+          tell you about Ellivia’s launch, and you can ask us to delete them at any time.
         </p>
 
         <Section title="Who we are">
@@ -63,6 +63,7 @@ export default function PrivacyPage() {
 
         <Section title="What we collect when you join">
           <ul>
+            <li>Your first and last name.</li>
             <li>Your email address.</li>
             <li>The date and time you joined.</li>
             <li>
@@ -75,9 +76,13 @@ export default function PrivacyPage() {
             </li>
           </ul>
           <p>
-            We do <strong className="font-semibold text-ink">not</strong> collect names, phone numbers, medical
+            We do <strong className="font-semibold text-ink">not</strong> collect phone numbers, addresses, medical
             records, hospital bills, insurance details, income, or other financial information on this website. Please
             don’t send us any of that information.
+          </p>
+          <p>
+            The savings example on our home page, where you can pick a household size and income range, runs entirely
+            in your browser. Your choices there are never saved or sent to us.
           </p>
         </Section>
 
@@ -114,11 +119,11 @@ export default function PrivacyPage() {
           </p>
         </Section>
 
-        <Section title="How we use your email">
+        <Section title="How we use your information">
           <p>
-            We use your email address only to send you updates about Ellivia’s launch, such as when the app becomes
-            available. We do not sell, rent, or share your email address with anyone for marketing, and we don’t use it
-            for advertising. Any launch email we send will include a way to stop receiving further messages.
+            We use your name and email address only to send you updates about Ellivia’s launch, such as when the app
+            becomes available, and to address those messages to you. We do not sell, rent, or share your name or email
+            address with anyone for marketing, and we don’t use them for advertising. Any launch email we send will include a way to stop receiving further messages.
           </p>
         </Section>
 
@@ -136,14 +141,14 @@ export default function PrivacyPage() {
 
         <Section title="How long we keep it">
           <p>
-            We keep your email address until Ellivia has launched and we have finished sending launch updates, or until
+            We keep your name and email address until Ellivia has launched and we have finished sending launch updates, or until
             you ask us to delete it, whichever comes first. After that, we plan to delete the waitlist.
           </p>
         </Section>
 
         <Section title="Your choices">
           <p>
-            You can ask us to delete your email address at any time by contacting <Contact />. Please send the request
+            You can ask us to delete your name and email address at any time by contacting <Contact />. Please send the request
             from the address you signed up with, so we can confirm it’s yours.
           </p>
         </Section>

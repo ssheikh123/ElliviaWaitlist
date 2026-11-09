@@ -130,3 +130,29 @@ end $$;
 select 'ALL WAITLIST DB TESTS PASSED' as result;
 
 rollback;
+
+-- ---------------------------------------------------------------------------
+-- waitlist_join_v2 (first/last name). Also rolled back.
+-- ---------------------------------------------------------------------------
+begin;
+do $$
+declare v text;
+begin
+  v := public.waitlist_join_v2('Names.Test@Example.com', '  Maria ', ' O''Brien-López ', 'instagram', 'v2', repeat('e',64));
+  if v <> 'ok' then raise exception 'FAIL v2 ok: %', v; end if;
+  perform 1 from public.waitlist where email='names.test@example.com' and first_name='Maria' and last_name='O''Brien-López';
+  if not found then raise exception 'FAIL names not stored/trimmed'; end if;
+  v := public.waitlist_join_v2('names.test@example.com', 'Other', 'Person', null, 'v2', repeat('e',64));
+  perform 1 from public.waitlist where email='names.test@example.com' and first_name='Maria';
+  if not found then raise exception 'FAIL duplicate overwrote names'; end if;
+  begin perform public.waitlist_join_v2('x1@example.com', '', 'Smith', null, 'v2', repeat('e',64)); raise exception 'FAIL empty first accepted';
+  exception when invalid_parameter_value then null; end;
+  begin perform public.waitlist_join_v2('x3@example.com', '<b>Ann', 'Smith', null, 'v2', repeat('e',64)); raise exception 'FAIL markup accepted';
+  exception when check_violation then null; end;
+  set local role anon;
+  begin perform public.waitlist_join_v2('x4@example.com','A','B',null,'v2',repeat('f',64)); raise exception 'FAIL anon can execute v2';
+  exception when insufficient_privilege then null; end;
+  reset role;
+end $$;
+select 'V2 DB TESTS PASSED' as result;
+rollback;

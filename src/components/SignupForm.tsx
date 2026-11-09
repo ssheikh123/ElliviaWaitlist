@@ -1,30 +1,37 @@
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type RefObject } from 'react'
 import { Check, CircleAlert, Copy, Loader2, Lock, Share2 } from 'lucide-react'
-import { isValidEmail, normalizeEmail } from '../../supabase/functions/_shared/waitlist-rules.ts'
+import {
+  isValidEmail,
+  isValidName,
+  normalizeEmail,
+  normalizeName,
+} from '../../supabase/functions/_shared/waitlist-rules.ts'
 import { ERROR_MESSAGES, submitWaitlist } from '../lib/waitlistApi.ts'
 import { getStoredReferral } from '../lib/referral.ts'
 import { config, isSignupConfigured, privacyHref } from '../config.ts'
 import { TurnstileWidget } from './TurnstileWidget.tsx'
 
 type Status = 'idle' | 'submitting' | 'success'
+type Field = 'firstName' | 'lastName' | 'email'
 
 interface Errors {
+  firstName?: string
+  lastName?: string
   email?: string
   consent?: string
   captcha?: string
   form?: string
 }
 
-export interface SignupFormProps {
-  /** Distinguishes the two forms on the page for analytics-free a11y labelling. */
-  placement: 'hero' | 'footer'
-}
+/** The id of the first field, so other parts of the page can send people straight to it. */
+export const SIGNUP_FIRST_FIELD_ID = 'waitlist-first-name'
 
-export function SignupForm({ placement }: SignupFormProps) {
+export function SignupForm() {
   const uid = useId()
   const ids = {
+    firstName: SIGNUP_FIRST_FIELD_ID,
+    lastName: `${uid}-last`,
     email: `${uid}-email`,
-    emailError: `${uid}-email-error`,
     consent: `${uid}-consent`,
     consentError: `${uid}-consent-error`,
     captchaError: `${uid}-captcha-error`,
@@ -32,7 +39,7 @@ export function SignupForm({ placement }: SignupFormProps) {
     success: `${uid}-success`,
   }
 
-  const [email, setEmail] = useState('')
+  const [values, setValues] = useState<Record<Field, string>>({ firstName: '', lastName: '', email: '' })
   const [consent, setConsent] = useState(false)
   const [token, setToken] = useState<string | null>(null)
   const [resetKey, setResetKey] = useState(0)
@@ -44,14 +51,24 @@ export function SignupForm({ placement }: SignupFormProps) {
   /** Set when the visitor pressed submit before Turnstile finished; we submit as soon as it does. */
   const submitWhenReady = useRef(false)
   const formRef = useRef<HTMLFormElement>(null)
-  const emailRef = useRef<HTMLInputElement>(null)
+  const refs = {
+    firstName: useRef<HTMLInputElement>(null),
+    lastName: useRef<HTMLInputElement>(null),
+    email: useRef<HTMLInputElement>(null),
+  }
   const consentRef = useRef<HTMLInputElement>(null)
   const successRef = useRef<HTMLHeadingElement>(null)
   const formAlertRef = useRef<HTMLDivElement>(null)
+  /** Fields are disabled while submitting, so focus after a server error waits for the re-render. */
+  const focusAfterRender = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     if (status === 'success') successRef.current?.focus()
-  }, [status])
+    if (status === 'idle' && focusAfterRender.current) {
+      focusAfterRender.current.focus()
+      focusAfterRender.current = null
+    }
+  }, [status, errors])
 
   useEffect(() => {
     if (token && submitWhenReady.current) {
@@ -86,20 +103,32 @@ export function SignupForm({ placement }: SignupFormProps) {
     }))
   }, [])
 
+  const update = (field: Field, value: string) => {
+    setValues((v) => ({ ...v, [field]: value }))
+    if (errors[field]) setErrors((x) => ({ ...x, [field]: undefined }))
+  }
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (inFlight.current || status !== 'idle') return
 
-    const normalized = normalizeEmail(email)
+    const firstName = normalizeName(values.firstName)
+    const lastName = normalizeName(values.lastName)
+    const email = normalizeEmail(values.email)
     const next: Errors = {}
-    if (!normalized) next.email = 'Please enter your email address.'
-    else if (!isValidEmail(normalized)) next.email = ERROR_MESSAGES.invalid_email
+    if (!firstName) next.firstName = 'Please enter your first name.'
+    else if (!isValidName(firstName)) next.firstName = 'Please use letters only in your first name.'
+    if (!lastName) next.lastName = 'Please enter your last name.'
+    else if (!isValidName(lastName)) next.lastName = 'Please use letters only in your last name.'
+    if (!email) next.email = 'Please enter your email address.'
+    else if (!isValidEmail(email)) next.email = ERROR_MESSAGES.invalid_email
     if (!consent) next.consent = ERROR_MESSAGES.consent_required
     // A load/challenge error is shown as-is; otherwise we simply wait for Turnstile.
     if (!token && errors.captcha) next.captcha = errors.captcha
 
     setErrors(next)
-    if (next.email) return emailRef.current?.focus()
+    const firstInvalid = (['firstName', 'lastName', 'email'] as const).find((f) => next[f])
+    if (firstInvalid) return refs[firstInvalid].current?.focus()
     if (next.consent) return consentRef.current?.focus()
     if (!token) {
       if (!next.captcha) {
@@ -112,7 +141,9 @@ export function SignupForm({ placement }: SignupFormProps) {
     inFlight.current = true
     setStatus('submitting')
     const result = await submitWaitlist({
-      email: normalized,
+      firstName,
+      lastName,
+      email,
       consent: true,
       turnstileToken: token,
       referralSource: getStoredReferral(),
@@ -128,22 +159,32 @@ export function SignupForm({ placement }: SignupFormProps) {
     resetCaptcha()
     setStatus('idle')
     const message = ERROR_MESSAGES[result.error]
-    if (result.error === 'invalid_email') {
+    if (result.error === 'invalid_name') {
+      setErrors({ firstName: message })
+      focusAfterRender.current = refs.firstName.current
+    } else if (result.error === 'invalid_email') {
       setErrors({ email: message })
-      emailRef.current?.focus()
+      focusAfterRender.current = refs.email.current
     } else if (result.error === 'consent_required') {
       setErrors({ consent: message })
-      consentRef.current?.focus()
+      focusAfterRender.current = consentRef.current
     } else if (result.error.startsWith('captcha_')) {
       setErrors({ captcha: message })
     } else {
       setErrors({ form: message })
-      formAlertRef.current?.focus()
+      focusAfterRender.current = formAlertRef.current
     }
   }
 
   if (status === 'success') {
-    return <SignupSuccess headingRef={successRef} headingId={ids.success} email={normalizeEmail(email)} />
+    return (
+      <SignupSuccess
+        headingRef={successRef}
+        headingId={ids.success}
+        firstName={normalizeName(values.firstName)}
+        email={normalizeEmail(values.email)}
+      />
+    )
   }
 
   if (!isSignupConfigured) {
@@ -161,63 +202,54 @@ export function SignupForm({ placement }: SignupFormProps) {
       ref={formRef}
       noValidate
       onSubmit={onSubmit}
-      aria-label={placement === 'hero' ? 'Join the Ellivia waitlist' : 'Join the Ellivia waitlist (bottom of page)'}
+      aria-label="Join the Ellivia waitlist"
       aria-busy={submitting}
       className="w-full"
     >
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <div className="flex-1">
-          <label htmlFor={ids.email} className="sr-only">
-            Email address
-          </label>
-          <input
-            ref={emailRef}
-            id={ids.email}
-            name="email"
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            maxLength={254}
-            placeholder="you@example.com"
-            value={email}
-            disabled={submitting}
-            onChange={(e) => {
-              setEmail(e.target.value)
-              if (errors.email) setErrors((x) => ({ ...x, email: undefined }))
-            }}
-            aria-invalid={Boolean(errors.email)}
-            aria-describedby={errors.email ? `${ids.emailError} ${ids.hint}` : ids.hint}
-            className={`h-14 w-full rounded-2xl border bg-white px-5 text-[17px] text-ink shadow-soft transition placeholder:text-muted focus:outline-none focus-visible:outline-none focus:ring-4 disabled:opacity-60 ${
-              errors.email
-                ? 'border-danger focus:ring-danger/15'
-                : 'border-line hover:border-baby-2 focus:border-ink-2 focus:ring-baby/70'
-            }`}
-          />
-        </div>
-        <button
-          type="submit"
+      <div className="grid gap-4 sm:grid-cols-2">
+        <TextField
+          inputRef={refs.firstName}
+          id={ids.firstName}
+          label="First name"
+          name="given-name"
+          autoComplete="given-name"
+          value={values.firstName}
+          error={errors.firstName}
           disabled={submitting}
-          className="group inline-flex h-14 shrink-0 items-center justify-center gap-2 rounded-2xl bg-mint-2 px-6 text-[17px] font-semibold text-ink shadow-soft ring-1 ring-ink/10 transition hover:bg-mint-3 active:scale-[0.98] disabled:cursor-wait disabled:opacity-80"
-        >
-          {submitting ? (
-            <>
-              <Loader2 className="size-5 animate-spin" aria-hidden="true" />
-              <span>Joining…</span>
-            </>
-          ) : (
-            <>
-              <span>Join the Free Waitlist</span>
-            </>
-          )}
-        </button>
+          onChange={(v) => update('firstName', v)}
+        />
+        <TextField
+          inputRef={refs.lastName}
+          id={ids.lastName}
+          label="Last name"
+          name="family-name"
+          autoComplete="family-name"
+          value={values.lastName}
+          error={errors.lastName}
+          disabled={submitting}
+          onChange={(v) => update('lastName', v)}
+        />
+      </div>
+      <div className="mt-4">
+        <TextField
+          inputRef={refs.email}
+          id={ids.email}
+          label="Email"
+          name="email"
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          maxLength={254}
+          value={values.email}
+          error={errors.email}
+          disabled={submitting}
+          describedBy={ids.hint}
+          onChange={(v) => update('email', v)}
+        />
       </div>
 
-      {errors.email && <FieldError id={ids.emailError}>{errors.email}</FieldError>}
-
-      <div className="mt-4 flex items-start gap-3">
+      <div className="mt-5 flex items-start gap-3">
         <input
           ref={consentRef}
           id={ids.consent}
@@ -235,8 +267,8 @@ export function SignupForm({ placement }: SignupFormProps) {
           className="mt-0.5 size-5 shrink-0 cursor-pointer rounded-md accent-ink"
         />
         <label htmlFor={ids.consent} className="cursor-pointer text-left text-[15px] leading-snug text-copy">
-          Email me when Ellivia launches. My email will only be used for Ellivia launch updates, and I can ask to
-          be removed at any time.{' '}
+          Email me when Ellivia launches. My name and email will only be used for Ellivia launch updates, and I can
+          ask to be removed at any time.{' '}
           <a href={privacyHref} className="font-medium text-link underline underline-offset-2 hover:text-ink">
             Privacy Policy
           </a>
@@ -245,12 +277,7 @@ export function SignupForm({ placement }: SignupFormProps) {
       {errors.consent && <FieldError id={ids.consentError}>{errors.consent}</FieldError>}
 
       <div className="mt-4">
-        <TurnstileWidget
-          resetKey={resetKey}
-          onToken={handleToken}
-          onExpire={handleExpire}
-          onError={handleCaptchaError}
-        />
+        <TurnstileWidget resetKey={resetKey} onToken={handleToken} onExpire={handleExpire} onError={handleCaptchaError} />
         {errors.captcha && <FieldError id={ids.captchaError}>{errors.captcha}</FieldError>}
         {awaitingCaptcha && !token && !errors.captcha && (
           <p className="mt-2 text-sm text-copy" role="status">
@@ -268,11 +295,87 @@ export function SignupForm({ placement }: SignupFormProps) {
         )}
       </div>
 
+      <button
+        type="submit"
+        disabled={submitting}
+        className="mt-5 inline-flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-mint-2 px-6 text-[17px] font-semibold text-ink shadow-soft ring-1 ring-ink/10 transition hover:bg-mint-3 active:scale-[0.98] disabled:cursor-wait disabled:opacity-80"
+      >
+        {submitting ? (
+          <>
+            <Loader2 className="size-5 animate-spin" aria-hidden="true" />
+            <span>Joining…</span>
+          </>
+        ) : (
+          <span>Join the Free Waitlist</span>
+        )}
+      </button>
+
       <p id={ids.hint} className="mt-4 flex items-center gap-2 text-sm text-muted">
         <Lock className="size-4 shrink-0" aria-hidden="true" />
-        Free to join. Email only. Never upload bills or medical information here.
+        Free to join. Never upload bills or medical information here.
       </p>
     </form>
+  )
+}
+
+function TextField({
+  inputRef,
+  id,
+  label,
+  value,
+  error,
+  disabled,
+  describedBy,
+  onChange,
+  type = 'text',
+  ...rest
+}: {
+  inputRef: RefObject<HTMLInputElement | null>
+  id: string
+  label: string
+  value: string
+  error?: string
+  disabled: boolean
+  describedBy?: string
+  onChange: (value: string) => void
+  type?: string
+  name: string
+  autoComplete: string
+  inputMode?: 'email' | 'text'
+  placeholder?: string
+  maxLength?: number
+}) {
+  const errorId = `${id}-error`
+  const describe = [error ? errorId : null, describedBy].filter(Boolean).join(' ') || undefined
+  return (
+    <div>
+      <label htmlFor={id} className="mb-1.5 block text-left text-[15px] font-semibold text-ink">
+        {label}
+      </label>
+      <input
+        ref={inputRef}
+        id={id}
+        type={type}
+        value={value}
+        disabled={disabled}
+        required
+        maxLength={rest.maxLength ?? 80}
+        autoCapitalize={type === 'email' ? 'none' : 'words'}
+        autoCorrect="off"
+        spellCheck={false}
+        onChange={(e) => onChange(e.target.value)}
+        aria-invalid={Boolean(error)}
+        aria-describedby={describe}
+        name={rest.name}
+        autoComplete={rest.autoComplete}
+        inputMode={rest.inputMode}
+        placeholder={rest.placeholder}
+        className={`h-13 w-full rounded-2xl border bg-white px-4 text-[17px] text-ink shadow-soft transition placeholder:text-muted focus:outline-none focus-visible:outline-none focus:ring-4 disabled:opacity-60 ${
+          error ? 'border-danger focus:ring-danger/15' : 'border-line hover:border-baby-2 focus:border-ink-2 focus:ring-baby/70'
+        }`}
+      />
+      {error && <FieldError id={errorId}>{error}</FieldError>}
+    </div>
   )
 }
 
@@ -288,10 +391,12 @@ function FieldError({ id, children }: { id: string; children: string }) {
 function SignupSuccess({
   headingRef,
   headingId,
+  firstName,
   email,
 }: {
   headingRef: RefObject<HTMLHeadingElement | null>
   headingId: string
+  firstName: string
   email: string
 }) {
   const [copied, setCopied] = useState(false)
@@ -327,7 +432,7 @@ function SignupSuccess({
         </span>
         <div className="min-w-0">
           <h3 ref={headingRef} id={headingId} tabIndex={-1} className="text-xl font-semibold tracking-tight text-ink focus:outline-none">
-            You’re on the list.
+            You’re on the list, {firstName}.
           </h3>
           <p className="mt-1.5 text-[15px] leading-relaxed text-copy">
             We’ll send Ellivia launch updates to <strong className="break-all font-semibold text-ink">{email}</strong>.

@@ -14,15 +14,16 @@ iPhone / browser
    │
    ├── Cloudflare Turnstile widget ──► token
    │
-   └── POST {email, consent, turnstileToken, referralSource}
+   └── POST {firstName, lastName, email, consent, turnstileToken, referralSource}
           │  apikey: sb_publishable_...   Origin: https://ssheikh123.github.io
           ▼
    Supabase Edge Function  join-waitlist   (verify_jwt = false; checks done in code)
      1. origin allowlist (CORS)          4. Turnstile Siteverify (server-side, secret key)
      2. publishable-key check            5. HMAC-hash the client IP
-     3. size / JSON / email / consent    6. rpc waitlist_join() with SUPABASE_SECRET_KEYS
+     3. size / JSON / names / email /    6. rpc waitlist_join_v2() with SUPABASE_SECRET_KEYS
+        consent
           ▼
-   Postgres  public.waitlist_join()  SECURITY DEFINER, executable by service_role only
+   Postgres  public.waitlist_join_v2()  SECURITY DEFINER, executable by service_role only
      • rate limits (10 / 10 min and 50 / day per connection, 1000 / hour globally)
      • INSERT … ON CONFLICT (email) DO NOTHING  → duplicates look identical to new signups
    Postgres  public.waitlist  RLS on, no policies, all API-role privileges revoked
@@ -114,6 +115,8 @@ TURNSTILE_LIVE=1 npx vitest run tests/functions/turnstile.test.ts
 ## Operating the waitlist
 
 * **View / export signups:** Supabase Dashboard → Table Editor → `waitlist` → Export to CSV.
+  Columns: `first_name`, `last_name`, `email`, `referral_source`, `created_at`, `consent_at`, `consent_version`.
+  Signups from before names were collected have blank names; you can type them in directly in the Table Editor.
 * **Signups by source:**
   ```sql
   select coalesce(referral_source, '(none)') as source, count(*) from public.waitlist group by 1 order by 2 desc;
