@@ -11,11 +11,27 @@ export const NAV_LINKS = [
   { href: '#faq', label: 'FAQ' },
 ] as const
 
-/** Apple's logo, drawn inline so it renders on every device (not just Apple ones). */
-function AppleLogo({ className = 'size-3.5' }: { className?: string }) {
+/**
+ * App Store icon, drawn inline so it renders on every device: a blue rounded
+ * square with the white "A" made of crossed sticks.
+ */
+function AppStoreIcon({ className = 'size-4' }: { className?: string }) {
+  const gid = useId()
   return (
-    <svg viewBox="0 0 24 24" className={className} aria-hidden="true" focusable="false" fill="currentColor">
-      <path d="M16.37 12.6c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.73-1.78-3.32-1.8-1.41-.14-2.76.83-3.48.83-.72 0-1.82-.81-3-.79-1.54.02-2.96.9-3.76 2.28-1.6 2.78-.41 6.9 1.15 9.16.77 1.1 1.68 2.34 2.87 2.3 1.15-.05 1.59-.75 2.98-.75 1.39 0 1.78.75 3 .72 1.24-.02 2.03-1.12 2.78-2.23.88-1.28 1.24-2.52 1.26-2.59-.03-.01-2.42-.93-2.44-3.67ZM14.1 5.86c.63-.77 1.06-1.83.94-2.89-.91.04-2.02.61-2.67 1.37-.58.67-1.09 1.76-.96 2.8 1.02.08 2.06-.52 2.69-1.28Z" />
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id={gid} x1="12" y1="0" x2="12" y2="24" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#1ac2fb" />
+          <stop offset="1" stopColor="#1e6ff1" />
+        </linearGradient>
+      </defs>
+      <rect width="24" height="24" rx="5.4" fill={`url(#${gid})`} />
+      <g stroke="#fff" strokeWidth="1.9" strokeLinecap="round" fill="none">
+        <path d="M13.1 5.6 7.3 15.6" />
+        <path d="M10.9 5.6l5.8 10" />
+        <path d="M5.6 13.5h12.8" />
+        <path d="M6.6 17.6l.6-1" />
+      </g>
     </svg>
   )
 }
@@ -27,7 +43,7 @@ export function LaunchPill({ className = '' }: { className?: string }) {
     >
       <span aria-hidden="true" className="inline-flex items-center gap-1">
         Live on the
-        <AppleLogo className="-mt-0.5 size-3.5" />
+        <AppStoreIcon className="size-4" />
         soon
       </span>
       <span className="sr-only">Live on the App Store soon</span>
