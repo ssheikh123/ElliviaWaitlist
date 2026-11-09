@@ -40,11 +40,10 @@ const handler = createHandler({
   hashSecret: Deno.env.get('RATE_LIMIT_SALT') || turnstileSecret,
   verifyTurnstile: (token, remoteIp, idempotencyKey) =>
     verifyTurnstileToken({ secret: turnstileSecret, token, remoteIp, allowedHostnames, idempotencyKey }),
-  joinWaitlist: async ({ email, firstName, lastName, referralSource, consentVersion, clientHash }) => {
-    const { data, error } = await getAdmin().rpc('waitlist_join_v2', {
+  joinWaitlist: async ({ email, name, referralSource, consentVersion, clientHash }) => {
+    const { data, error } = await getAdmin().rpc('waitlist_join_v3', {
       p_email: email,
-      p_first_name: firstName,
-      p_last_name: lastName,
+      p_name: name,
       p_referral_source: referralSource,
       p_consent_version: consentVersion,
       p_client_hash: clientHash,

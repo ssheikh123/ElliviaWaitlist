@@ -35,8 +35,7 @@ function solveCaptcha(token = 'token-1') {
 }
 
 async function fillNames(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(screen.getByLabelText('First name'), ' Jane ')
-  await user.type(screen.getByLabelText('Last name'), "O'Brien")
+  await user.type(screen.getByLabelText('Name'), "  Jane   O'Brien ")
 }
 
 async function fillValid(user: ReturnType<typeof userEvent.setup>) {
@@ -57,10 +56,10 @@ afterEach(() => vi.unstubAllGlobals())
 describe('SignupForm', () => {
   it('renders name and email fields, consent checkbox, Turnstile and CTA', () => {
     render(<SignupForm />)
-    expect(screen.getByLabelText('First name')).toHaveAttribute('autocomplete', 'given-name')
-    expect(screen.getByLabelText('Last name')).toHaveAttribute('autocomplete', 'family-name')
-    expect(screen.getByLabelText('First name')).toBeRequired()
-    expect(screen.getByLabelText('Last name')).toBeRequired()
+    expect(screen.getByLabelText('Name')).toHaveAttribute('autocomplete', 'name')
+    expect(screen.getByLabelText('Name')).toBeRequired()
+    expect(screen.queryByLabelText('First name')).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('Last name')).not.toBeInTheDocument()
     expect(screen.getByLabelText('Email')).toHaveAttribute('type', 'email')
     expect(screen.getByRole('checkbox', { name: /email me when ellivia launches/i })).not.toBeChecked()
     expect(screen.getByTestId('turnstile')).toBeInTheDocument()
@@ -85,7 +84,7 @@ describe('SignupForm', () => {
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
-  it('requires first and last name before submitting', async () => {
+  it('requires a name before submitting', async () => {
     const user = userEvent.setup()
     render(<SignupForm />)
     solveCaptcha()
@@ -93,11 +92,9 @@ describe('SignupForm', () => {
     await user.click(screen.getByRole('checkbox'))
     await user.click(screen.getByRole('button', { name: /join/i }))
 
-    expect(screen.getByLabelText('First name')).toHaveAttribute('aria-invalid', 'true')
-    expect(screen.getByLabelText('Last name')).toHaveAttribute('aria-invalid', 'true')
-    expect(screen.getByLabelText('First name')).toHaveFocus()
-    expect(screen.getByText('Please enter your first name.')).toBeInTheDocument()
-    expect(screen.getByText('Please enter your last name.')).toBeInTheDocument()
+    expect(screen.getByLabelText('Name')).toHaveAttribute('aria-invalid', 'true')
+    expect(screen.getByLabelText('Name')).toHaveFocus()
+    expect(screen.getByText('Please enter your name.')).toBeInTheDocument()
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
@@ -105,13 +102,11 @@ describe('SignupForm', () => {
     const user = userEvent.setup()
     render(<SignupForm />)
     solveCaptcha()
-    await user.type(screen.getByLabelText('First name'), 'R2D2')
-    await user.type(screen.getByLabelText('Last name'), '<b>')
+    await user.type(screen.getByLabelText('Name'), 'R2D2 <b>')
     await user.type(screen.getByLabelText('Email'), 'jane@example.com')
     await user.click(screen.getByRole('checkbox'))
     await user.click(screen.getByRole('button', { name: /join/i }))
-    expect(screen.getByText(/letters only in your first name/i)).toBeInTheDocument()
-    expect(screen.getByText(/letters only in your last name/i)).toBeInTheDocument()
+    expect(screen.getByText(/enter your name using letters only/i)).toBeInTheDocument()
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
@@ -190,8 +185,7 @@ describe('SignupForm', () => {
     expect((init!.headers as Record<string, string>).apikey).toBe('sb_publishable_test')
     expect((init!.headers as Record<string, string>).Authorization).toBeUndefined()
     expect(JSON.parse(init!.body as string)).toEqual({
-      firstName: 'Jane',
-      lastName: "O'Brien",
+      name: "Jane O'Brien",
       email: 'jane@example.com',
       consent: true,
       turnstileToken: 'tok-xyz',
@@ -286,15 +280,15 @@ describe('SignupForm', () => {
     expect(screen.getAllByRole('alert').some((a) => /security check couldn’t load/i.test(a.textContent ?? ''))).toBe(true)
   })
 
-  it('maps a server-side name error back to the name field', async () => {
+  it('maps a server-side name error back to the Name field', async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse({ ok: false, error: 'invalid_name' }, 400))
     const user = userEvent.setup()
     render(<SignupForm />)
     solveCaptcha()
     await fillValid(user)
     await user.click(screen.getByRole('button', { name: /join/i }))
-    await waitFor(() => expect(screen.getByLabelText('First name')).toHaveAttribute('aria-invalid', 'true'))
-    expect(screen.getByLabelText('First name')).toHaveFocus()
+    await waitFor(() => expect(screen.getByLabelText('Name')).toHaveAttribute('aria-invalid', 'true'))
+    expect(screen.getByLabelText('Name')).toHaveFocus()
   })
 
   it('maps server-side validation errors back to the right field', async () => {

@@ -57,7 +57,7 @@ export async function submitWaitlist(body: WaitlistRequestBody, signal?: AbortSi
 export const ERROR_MESSAGES: Record<WaitlistErrorCode | 'network_error', string> = {
   invalid_request: 'Something about that request didn’t look right. Please refresh the page and try again.',
   invalid_email: 'Please enter a valid email address, like name@example.com.',
-  invalid_name: 'Please enter your first and last name using letters only.',
+  invalid_name: 'Please enter your name using letters only.',
   consent_required: 'Please check the box to confirm you’d like launch updates.',
   captcha_required: 'Please complete the quick security check below.',
   captcha_failed: 'The security check didn’t go through. Please try it again.',

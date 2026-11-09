@@ -31,8 +31,7 @@ function post(body: unknown, init: { origin?: string | null; apikey?: string | n
 }
 
 const valid = {
-  firstName: '  Jane ',
-  lastName: "O'Brien-López",
+  name: "  Jane   O'Brien-López ",
   email: '  Jane.Doe+ER@Example.COM ',
   consent: true,
   turnstileToken: 'tok',
@@ -48,8 +47,7 @@ describe('join-waitlist handler', () => {
     expect(res.headers.get('access-control-allow-origin')).toBe(ORIGIN)
     expect(deps.joinWaitlist).toHaveBeenCalledWith({
       email: 'jane.doe+er@example.com',
-      firstName: 'Jane',
-      lastName: "O'Brien-López",
+      name: "Jane O'Brien-López",
       referralSource: 'instagram',
       consentVersion: CONSENT_VERSION,
       clientHash: expect.stringMatching(/^[a-f0-9]{64}$/),
@@ -85,14 +83,14 @@ describe('join-waitlist handler', () => {
   })
 
   it.each([
-    [{ firstName: '' }],
-    [{ lastName: '   ' }],
-    [{ firstName: undefined }],
-    [{ lastName: 42 }],
-    [{ firstName: '<script>' }],
-    [{ firstName: 'R2-D2' }],
-    [{ lastName: 'a@b.co' }],
-    [{ firstName: 'x'.repeat(81) }],
+    [{ name: '' }],
+    [{ name: '   ' }],
+    [{ name: undefined }],
+    [{ name: 42 }],
+    [{ name: '<script>' }],
+    [{ name: 'R2-D2' }],
+    [{ name: 'a@b.co' }],
+    [{ name: 'x'.repeat(121) }],
   ])('rejects missing or invalid names %j before any captcha or database work', async (patch) => {
     const { deps, handle } = setup()
     const res = await handle(post({ ...valid, ...patch }))
@@ -102,10 +100,10 @@ describe('join-waitlist handler', () => {
     expect(deps.joinWaitlist).not.toHaveBeenCalled()
   })
 
-  it.each([['José'], ['Nguyễn'], ['Mary Jane'], ['St. John'], ['李'], ['J']])('accepts the name %s', async (firstName) => {
+  it.each([['José Ramírez'], ['Nguyễn Văn An'], ['Mary Jane Watson'], ['John St. John'], ['李明'], ['Cher']])('accepts the name %s', async (name) => {
     const { deps, handle } = setup()
-    expect((await handle(post({ ...valid, firstName }))).status).toBe(200)
-    expect(vi.mocked(deps.joinWaitlist).mock.calls[0]![0].firstName).toBe(firstName)
+    expect((await handle(post({ ...valid, name }))).status).toBe(200)
+    expect(vi.mocked(deps.joinWaitlist).mock.calls[0]![0].name).toBe(name)
   })
 
   it('rejects a non-string email', async () => {

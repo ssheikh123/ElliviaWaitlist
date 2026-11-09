@@ -12,11 +12,10 @@ import { config, isSignupConfigured, privacyHref } from '../config.ts'
 import { TurnstileWidget } from './TurnstileWidget.tsx'
 
 type Status = 'idle' | 'submitting' | 'success'
-type Field = 'firstName' | 'lastName' | 'email'
+type Field = 'name' | 'email'
 
 interface Errors {
-  firstName?: string
-  lastName?: string
+  name?: string
   email?: string
   consent?: string
   captcha?: string
@@ -24,13 +23,12 @@ interface Errors {
 }
 
 /** The id of the first field, so other parts of the page can send people straight to it. */
-export const SIGNUP_FIRST_FIELD_ID = 'waitlist-first-name'
+export const SIGNUP_FIRST_FIELD_ID = 'waitlist-name'
 
 export function SignupForm() {
   const uid = useId()
   const ids = {
-    firstName: SIGNUP_FIRST_FIELD_ID,
-    lastName: `${uid}-last`,
+    name: SIGNUP_FIRST_FIELD_ID,
     email: `${uid}-email`,
     consent: `${uid}-consent`,
     consentError: `${uid}-consent-error`,
@@ -39,7 +37,7 @@ export function SignupForm() {
     success: `${uid}-success`,
   }
 
-  const [values, setValues] = useState<Record<Field, string>>({ firstName: '', lastName: '', email: '' })
+  const [values, setValues] = useState<Record<Field, string>>({ name: '', email: '' })
   const [consent, setConsent] = useState(false)
   const [token, setToken] = useState<string | null>(null)
   const [resetKey, setResetKey] = useState(0)
@@ -52,8 +50,7 @@ export function SignupForm() {
   const submitWhenReady = useRef(false)
   const formRef = useRef<HTMLFormElement>(null)
   const refs = {
-    firstName: useRef<HTMLInputElement>(null),
-    lastName: useRef<HTMLInputElement>(null),
+    name: useRef<HTMLInputElement>(null),
     email: useRef<HTMLInputElement>(null),
   }
   const consentRef = useRef<HTMLInputElement>(null)
@@ -112,14 +109,11 @@ export function SignupForm() {
     event.preventDefault()
     if (inFlight.current || status !== 'idle') return
 
-    const firstName = normalizeName(values.firstName)
-    const lastName = normalizeName(values.lastName)
+    const name = normalizeName(values.name)
     const email = normalizeEmail(values.email)
     const next: Errors = {}
-    if (!firstName) next.firstName = 'Please enter your first name.'
-    else if (!isValidName(firstName)) next.firstName = 'Please use letters only in your first name.'
-    if (!lastName) next.lastName = 'Please enter your last name.'
-    else if (!isValidName(lastName)) next.lastName = 'Please use letters only in your last name.'
+    if (!name) next.name = 'Please enter your name.'
+    else if (!isValidName(name)) next.name = ERROR_MESSAGES.invalid_name
     if (!email) next.email = 'Please enter your email address.'
     else if (!isValidEmail(email)) next.email = ERROR_MESSAGES.invalid_email
     if (!consent) next.consent = ERROR_MESSAGES.consent_required
@@ -127,7 +121,7 @@ export function SignupForm() {
     if (!token && errors.captcha) next.captcha = errors.captcha
 
     setErrors(next)
-    const firstInvalid = (['firstName', 'lastName', 'email'] as const).find((f) => next[f])
+    const firstInvalid = (['name', 'email'] as const).find((f) => next[f])
     if (firstInvalid) return refs[firstInvalid].current?.focus()
     if (next.consent) return consentRef.current?.focus()
     if (!token) {
@@ -141,8 +135,7 @@ export function SignupForm() {
     inFlight.current = true
     setStatus('submitting')
     const result = await submitWaitlist({
-      firstName,
-      lastName,
+      name,
       email,
       consent: true,
       turnstileToken: token,
@@ -160,8 +153,8 @@ export function SignupForm() {
     setStatus('idle')
     const message = ERROR_MESSAGES[result.error]
     if (result.error === 'invalid_name') {
-      setErrors({ firstName: message })
-      focusAfterRender.current = refs.firstName.current
+      setErrors({ name: message })
+      focusAfterRender.current = refs.name.current
     } else if (result.error === 'invalid_email') {
       setErrors({ email: message })
       focusAfterRender.current = refs.email.current
@@ -181,7 +174,7 @@ export function SignupForm() {
       <SignupSuccess
         headingRef={successRef}
         headingId={ids.success}
-        firstName={normalizeName(values.firstName)}
+        firstName={normalizeName(values.name).split(' ')[0] ?? ''}
         email={normalizeEmail(values.email)}
       />
     )
@@ -208,29 +201,18 @@ export function SignupForm() {
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <TextField
-          inputRef={refs.firstName}
-          id={ids.firstName}
-          label="First name"
-          name="given-name"
-          autoComplete="given-name"
-          value={values.firstName}
-          error={errors.firstName}
+          inputRef={refs.name}
+          id={ids.name}
+          label="Name"
+          name="name"
+          autoComplete="name"
+          placeholder="Your name"
+          maxLength={120}
+          value={values.name}
+          error={errors.name}
           disabled={submitting}
-          onChange={(v) => update('firstName', v)}
+          onChange={(v) => update('name', v)}
         />
-        <TextField
-          inputRef={refs.lastName}
-          id={ids.lastName}
-          label="Last name"
-          name="family-name"
-          autoComplete="family-name"
-          value={values.lastName}
-          error={errors.lastName}
-          disabled={submitting}
-          onChange={(v) => update('lastName', v)}
-        />
-      </div>
-      <div className="mt-4">
         <TextField
           inputRef={refs.email}
           id={ids.email}

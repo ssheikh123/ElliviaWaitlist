@@ -4,10 +4,10 @@
  */
 
 /** Bump this whenever the consent wording on the signup form changes. */
-export const CONSENT_VERSION = '2026-11-09-name-email-launch-notify-v2'
+export const CONSENT_VERSION = '2026-11-10-name-email-launch-notify-v3'
 
 export const MAX_EMAIL_LENGTH = 254
-export const MAX_NAME_LENGTH = 80
+export const MAX_NAME_LENGTH = 120
 
 /**
  * Referral sources accepted from `?ref=`. Anything else that is shaped like a slug
@@ -48,8 +48,8 @@ export function isValidEmail(normalized: string): boolean {
 }
 
 /**
- * Names: letters from any language plus spaces, apostrophes, hyphens and periods
- * (O'Brien, Mary-Jane, José, Nguyễn, St. John). No digits, symbols, or markup.
+ * A person's name (one field, e.g. "Maria O'Brien-López"): letters from any language plus
+ * spaces, apostrophes, hyphens and periods. No digits, symbols, or markup.
  */
 const NAME_PATTERN = /^[\p{L}\p{M}](?:[\p{L}\p{M}'’ .-]*[\p{L}\p{M}.])?$/u
 
@@ -88,8 +88,7 @@ export type WaitlistErrorCode =
 export type WaitlistResponse = { ok: true } | { ok: false; error: WaitlistErrorCode }
 
 export interface WaitlistRequestBody {
-  firstName: string
-  lastName: string
+  name: string
   email: string
   consent: boolean
   turnstileToken: string

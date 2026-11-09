@@ -4,7 +4,7 @@ import { Wordmark } from './components/Logo.tsx'
 import { Footer } from './components/Footer.tsx'
 import { config, homeHref } from './config.ts'
 
-export const PRIVACY_LAST_UPDATED = 'November 9, 2026'
+export const PRIVACY_LAST_UPDATED = 'November 10, 2026'
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -63,7 +63,7 @@ export default function PrivacyPage() {
 
         <Section title="What we collect when you join">
           <ul>
-            <li>Your first and last name.</li>
+            <li>Your name.</li>
             <li>Your email address.</li>
             <li>The date and time you joined.</li>
             <li>
