@@ -1,0 +1,23 @@
+# Dependencies & build output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Environment files: never commit real values
+.env
+.env.*
+!.env.example
+supabase/functions/.env
+supabase/.env
+supabase/.temp/
+supabase/.branches/
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+.claude/

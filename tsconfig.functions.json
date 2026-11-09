@@ -1,0 +1,17 @@
+{
+  "//": "Type-checks the runtime-agnostic Edge Function logic and its tests. index.ts (Deno entrypoint) is checked by Deno at deploy time.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["vitest/globals", "node"],
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true
+  },
+  "include": ["supabase/functions/_shared", "supabase/functions/join-waitlist/handler.ts", "supabase/functions/join-waitlist/turnstile.ts", "tests/functions"]
+}

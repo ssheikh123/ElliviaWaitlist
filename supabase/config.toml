@@ -1,0 +1,9 @@
+# Supabase CLI configuration (only the parts this project uses).
+# Link to the hosted project with:  npx supabase link --project-ref rjmtferugizqsxaqxkds
+project_id = "ElliviaWaitlist"
+
+[functions.join-waitlist]
+# Public signup endpoint. The new sb_publishable_ keys are not JWTs, so the
+# platform JWT check must be off; the function enforces origin, apikey,
+# Turnstile, validation, and rate limits itself.
+verify_jwt = false
