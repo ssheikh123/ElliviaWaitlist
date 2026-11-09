@@ -18,12 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # PUBLIC values only: they are embedded in the website.
-      # Set them under Settings -> Secrets and variables -> Actions -> Variables.
-      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
-      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
-      VITE_WAITLIST_FUNCTION_URL: ${{ vars.VITE_WAITLIST_FUNCTION_URL }}
-      VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
-      VITE_CONTACT_EMAIL: ${{ vars.VITE_CONTACT_EMAIL }}
+      # Set them under Settings -> Secrets and variables -> Actions (Variables preferred;
+      # repository Secrets with the same names are accepted as a fallback).
+      VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL || secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY || secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VITE_WAITLIST_FUNCTION_URL: ${{ vars.VITE_WAITLIST_FUNCTION_URL || secrets.VITE_WAITLIST_FUNCTION_URL }}
+      VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY || secrets.VITE_TURNSTILE_SITE_KEY }}
+      VITE_CONTACT_EMAIL: ${{ vars.VITE_CONTACT_EMAIL || secrets.VITE_CONTACT_EMAIL }}
     steps:
       - uses: actions/checkout@v7
 
