@@ -5,32 +5,67 @@ import { HeroBill } from './HeroBill.tsx'
 
 afterEach(() => vi.useRealTimers())
 
+async function openWithEllivia() {
+  const user = userEvent.setup()
+  render(<HeroBill />)
+  await user.click(screen.getByRole('radio', { name: 'With Ellivia' }))
+  return user
+}
+
 describe('HeroBill', () => {
-  it('is clearly labelled as a sample and concept', () => {
+  it('is clearly labelled as an example with its sources and limits', () => {
     render(<HeroBill />)
-    expect(screen.getByText(/sample bill and concept app/i)).toBeInTheDocument()
+    const caption = screen.getByText(/example only/i).closest('figcaption')!
+    expect(caption).toHaveTextContent(/sample bill/i)
+    expect(caption).toHaveTextContent(/effective July 1, 2025/i)
+    expect(caption).toHaveTextContent(/not copays/i)
+    expect(caption).toHaveTextContent(/RUSH makes the final decision/i)
+    expect(caption).toHaveTextContent(/nothing you choose here is saved or sent/i)
   })
 
-  it('flips between the confusing bill and the explained bill', async () => {
-    const user = userEvent.setup()
+  it('starts on the confusing bill with the full balance and no discount', () => {
     render(<HeroBill />)
-    const own = screen.getByRole('radio', { name: 'On its own' })
-    const withE = screen.getByRole('radio', { name: 'With Ellivia' })
-
-    expect(own).toHaveAttribute('aria-checked', 'true')
-    expect(screen.queryByText(/scan your bill with your phone/i)).not.toBeInTheDocument()
-
-    await user.click(withE)
-    expect(withE).toHaveAttribute('aria-checked', 'true')
-    expect(screen.getByText(/scan your bill with your phone/i)).toBeInTheDocument()
-    expect(screen.getByText(/see where and how to apply/i)).toBeInTheDocument()
-
-    await user.click(own)
-    expect(own).toHaveAttribute('aria-checked', 'true')
-    expect(screen.queryByText(/scan your bill with your phone/i)).not.toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: 'On its own' })).toHaveAttribute('aria-checked', 'true')
+    expect(screen.getByText('$3,128.00')).toBeInTheDocument()
+    expect(screen.queryByText(/% off/)).not.toBeInTheDocument()
+    expect(screen.getByText(/scan your bill to get started/i)).toBeInTheDocument()
   })
 
-  it('reveals the explanation once on its own, but never overrides the visitor’s choice', () => {
+  it('defaults to the 80% band for a family of 4 and shows the new amount', async () => {
+    await openWithEllivia()
+    expect(screen.getByRole('radio', { name: '4 people' })).toBeChecked()
+    expect(screen.getByRole('radio', { name: '$99,001 – $132,000' })).toBeChecked()
+    expect(screen.getByText('$625.60')).toBeInTheDocument()
+    expect(screen.getAllByText('80% off').length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/Underinsured Discount Program/).length).toBeGreaterThan(0)
+  })
+
+  it('shows up to 100% off at or below 300% of the poverty guideline', async () => {
+    const user = await openWithEllivia()
+    await user.click(screen.getByRole('radio', { name: 'Up to $99,000' }))
+    expect(screen.getByText('$0.00')).toBeInTheDocument()
+    expect(screen.getAllByText('Up to 100% off').length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/Charity Care Program/).length).toBeGreaterThan(0)
+  })
+
+  it('does not promise a discount above 400%', async () => {
+    const user = await openWithEllivia()
+    await user.click(screen.getByRole('radio', { name: 'Over $132,000' }))
+    expect(screen.queryByText(/% off/)).not.toBeInTheDocument()
+    expect(screen.getByText(/may not lower this bill/i)).toBeInTheDocument()
+    expect(screen.getAllByText('$3,128.00').length).toBeGreaterThan(0)
+  })
+
+  it('recalculates the income ranges for the household size', async () => {
+    const user = await openWithEllivia()
+    await user.click(screen.getByRole('radio', { name: '1 person' }))
+    expect(screen.getByRole('radio', { name: 'Up to $47,880' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: '$47,881 – $63,840' })).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: '6 people' }))
+    expect(screen.getByRole('radio', { name: 'Up to $133,080' })).toBeInTheDocument()
+  })
+
+  it('reveals the explanation once on its own', () => {
     vi.useFakeTimers()
     render(<HeroBill />)
     act(() => vi.advanceTimersByTime(2500))
