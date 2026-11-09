@@ -38,7 +38,7 @@ jobs:
           missing=0
           for name in VITE_SUPABASE_URL VITE_SUPABASE_PUBLISHABLE_KEY VITE_TURNSTILE_SITE_KEY; do
             if [ -z "${!name}" ]; then
-              echo "::error::Repository variable $name is not set (Settings -> Secrets and variables -> Actions -> Variables)."
+              echo "::error::$name is not set as a repository Variable or Secret (Settings -> Secrets and variables -> Actions)."
               missing=1
             fi
           done
