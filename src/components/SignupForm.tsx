@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState, type FormEvent, type RefObject } from 'react'
-import { ArrowRight, Check, CircleAlert, Copy, Loader2, Lock, Share2 } from 'lucide-react'
+import { Check, CircleAlert, Copy, Loader2, Lock, Share2 } from 'lucide-react'
 import { isValidEmail, normalizeEmail } from '../../supabase/functions/_shared/waitlist-rules.ts'
 import { ERROR_MESSAGES, submitWaitlist } from '../lib/waitlistApi.ts'
 import { getStoredReferral } from '../lib/referral.ts'
@@ -148,7 +148,7 @@ export function SignupForm({ placement }: SignupFormProps) {
 
   if (!isSignupConfigured) {
     return (
-      <div role="status" className="rounded-2xl border border-line bg-ice p-5 text-sm text-slate-copy">
+      <div role="status" className="rounded-2xl border border-line bg-azure p-5 text-sm text-copy">
         The waitlist form isn’t configured yet. Please check back soon.
       </div>
     )
@@ -190,17 +190,17 @@ export function SignupForm({ placement }: SignupFormProps) {
             }}
             aria-invalid={Boolean(errors.email)}
             aria-describedby={errors.email ? `${ids.emailError} ${ids.hint}` : ids.hint}
-            className={`h-14 w-full rounded-2xl border bg-white px-5 text-[17px] text-ink shadow-soft transition placeholder:text-slate-soft focus:outline-none focus-visible:outline-none focus:ring-4 disabled:opacity-60 ${
+            className={`h-14 w-full rounded-2xl border bg-white px-5 text-[17px] text-ink shadow-soft transition placeholder:text-muted focus:outline-none focus-visible:outline-none focus:ring-4 disabled:opacity-60 ${
               errors.email
                 ? 'border-danger focus:ring-danger/15'
-                : 'border-line hover:border-[#c9d6e8] focus:border-accent focus:ring-accent/15'
+                : 'border-line hover:border-baby-2 focus:border-ink-2 focus:ring-baby/70'
             }`}
           />
         </div>
         <button
           type="submit"
           disabled={submitting}
-          className="group inline-flex h-14 shrink-0 items-center justify-center gap-2 rounded-2xl bg-navy-900 px-6 text-[17px] font-semibold text-white shadow-soft transition hover:bg-navy-800 hover:shadow-lift active:scale-[0.98] disabled:cursor-wait disabled:opacity-80"
+          className="group inline-flex h-14 shrink-0 items-center justify-center gap-2 rounded-2xl bg-mint-2 px-6 text-[17px] font-semibold text-ink shadow-soft ring-1 ring-ink/10 transition hover:bg-mint-3 active:scale-[0.98] disabled:cursor-wait disabled:opacity-80"
         >
           {submitting ? (
             <>
@@ -210,7 +210,6 @@ export function SignupForm({ placement }: SignupFormProps) {
           ) : (
             <>
               <span>Join the Free Waitlist</span>
-              <ArrowRight className="size-5 transition group-hover:translate-x-0.5" aria-hidden="true" />
             </>
           )}
         </button>
@@ -233,12 +232,12 @@ export function SignupForm({ placement }: SignupFormProps) {
           aria-invalid={Boolean(errors.consent)}
           aria-describedby={errors.consent ? ids.consentError : undefined}
           required
-          className="mt-0.5 size-5 shrink-0 cursor-pointer rounded-md accent-navy-900"
+          className="mt-0.5 size-5 shrink-0 cursor-pointer rounded-md accent-ink"
         />
-        <label htmlFor={ids.consent} className="cursor-pointer text-left text-[15px] leading-snug text-slate-copy">
+        <label htmlFor={ids.consent} className="cursor-pointer text-left text-[15px] leading-snug text-copy">
           Email me when Ellivia launches. My email will only be used for Ellivia launch updates, and I can ask to
           be removed at any time.{' '}
-          <a href={privacyHref} className="font-medium text-accent-600 underline underline-offset-2 hover:text-navy-900">
+          <a href={privacyHref} className="font-medium text-link underline underline-offset-2 hover:text-ink">
             Privacy Policy
           </a>
         </label>
@@ -254,7 +253,7 @@ export function SignupForm({ placement }: SignupFormProps) {
         />
         {errors.captcha && <FieldError id={ids.captchaError}>{errors.captcha}</FieldError>}
         {awaitingCaptcha && !token && !errors.captcha && (
-          <p className="mt-2 text-sm text-slate-copy" role="status">
+          <p className="mt-2 text-sm text-copy" role="status">
             Finishing the security check. Your signup will continue automatically.
           </p>
         )}
@@ -269,7 +268,7 @@ export function SignupForm({ placement }: SignupFormProps) {
         )}
       </div>
 
-      <p id={ids.hint} className="mt-4 flex items-center gap-2 text-sm text-slate-soft">
+      <p id={ids.hint} className="mt-4 flex items-center gap-2 text-sm text-muted">
         <Lock className="size-4 shrink-0" aria-hidden="true" />
         Free to join. Email only. Never upload bills or medical information here.
       </p>
@@ -327,21 +326,21 @@ function SignupSuccess({
           <Check className="size-6" strokeWidth={2.5} />
         </span>
         <div className="min-w-0">
-          <h3 ref={headingRef} id={headingId} tabIndex={-1} className="text-xl font-semibold tracking-tight text-navy-900 focus:outline-none">
+          <h3 ref={headingRef} id={headingId} tabIndex={-1} className="text-xl font-semibold tracking-tight text-ink focus:outline-none">
             You’re on the list.
           </h3>
-          <p className="mt-1.5 text-[15px] leading-relaxed text-slate-copy">
+          <p className="mt-1.5 text-[15px] leading-relaxed text-copy">
             We’ll send Ellivia launch updates to <strong className="break-all font-semibold text-ink">{email}</strong>.
             If this address was already on the waitlist, nothing changes and you won’t get duplicate messages.
           </p>
         </div>
       </div>
       <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-success/10 pt-5">
-        <p className="text-[15px] text-slate-copy">Know someone who could use Ellivia?</p>
+        <p className="text-[15px] text-copy">Know someone who could use Ellivia?</p>
         <button
           type="button"
           onClick={share}
-          className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-white px-4 text-[15px] font-medium text-navy-900 shadow-soft transition hover:border-[#c9d6e8] active:scale-[0.98]"
+          className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-white px-4 text-[15px] font-medium text-ink shadow-soft transition hover:border-baby-2 active:scale-[0.98]"
         >
           {canShare ? <Share2 className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}
           {copied ? 'Link copied' : canShare ? 'Share Ellivia' : 'Copy link'}

@@ -9,8 +9,8 @@ export const PRIVACY_LAST_UPDATED = 'November 8, 2026'
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mt-10">
-      <h2 className="text-xl font-semibold tracking-tight text-navy-900">{title}</h2>
-      <div className="mt-3 space-y-3 leading-relaxed text-slate-copy [&_li]:ml-5 [&_li]:list-disc [&_li]:pl-1 [&_ul]:space-y-2">
+      <h2 className="text-xl font-bold tracking-tight text-ink">{title}</h2>
+      <div className="mt-3 space-y-3 leading-relaxed text-copy [&_li]:ml-5 [&_li]:list-disc [&_li]:pl-1 [&_ul]:space-y-2">
         {children}
       </div>
     </section>
@@ -19,7 +19,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 function Contact() {
   return config.contactEmail ? (
-    <a href={`mailto:${config.contactEmail}`} className="font-medium text-accent-600 underline underline-offset-2">
+    <a href={`mailto:${config.contactEmail}`} className="font-medium text-link underline underline-offset-2">
       {config.contactEmail}
     </a>
   ) : (
@@ -30,26 +30,25 @@ function Contact() {
 export default function PrivacyPage() {
   return (
     <>
-      <header className="border-b border-line bg-white/90 pt-[env(safe-area-inset-top)] backdrop-blur">
+      <header className="border-b border-line bg-azure/90 pt-[env(safe-area-inset-top)] backdrop-blur">
         <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-4 sm:px-6">
           <a href={homeHref} aria-label="Ellivia home" className="rounded-lg">
             <Wordmark />
           </a>
-          <a href={homeHref} className="inline-flex items-center gap-1.5 text-[15px] font-medium text-navy-900 hover:underline">
+          <a href={homeHref} className="inline-flex items-center gap-1.5 text-[15px] font-medium text-ink hover:underline">
             <ArrowLeft className="size-4" aria-hidden="true" />
             Back to home
           </a>
         </div>
       </header>
 
-      <main id="main" className="mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-accent-600">Privacy Policy</p>
-        <h1 className="mt-3 text-[36px] font-semibold leading-tight tracking-[-0.03em] text-navy-900 sm:text-[44px]">
+      <main id="main" className="mx-auto my-10 max-w-3xl rounded-[28px] bg-paper px-5 py-12 shadow-soft sm:my-14 sm:px-12 sm:py-16">
+        <h1 className="text-[36px] font-extrabold leading-tight tracking-[-0.03em] text-ink sm:text-[44px]">
           Ellivia waitlist privacy policy
         </h1>
-        <p className="mt-3 text-slate-soft">Last updated: {PRIVACY_LAST_UPDATED}</p>
+        <p className="mt-3 text-muted">Last updated: {PRIVACY_LAST_UPDATED}</p>
 
-        <p className="mt-8 text-lg leading-relaxed text-slate-copy">
+        <p className="mt-8 text-lg leading-relaxed text-copy">
           This policy covers this prelaunch waitlist website only. It does not cover the future Ellivia iOS app, which
           will have its own privacy policy. In short: we only ask for your email address, we only use it to tell you
           about Ellivia’s launch, and you can ask us to delete it at any time.
@@ -90,7 +89,7 @@ export default function PrivacyPage() {
               device, and IP address under{' '}
               <a
                 href="https://www.cloudflare.com/turnstile-privacy-policy/"
-                className="font-medium text-accent-600 underline underline-offset-2"
+                className="font-medium text-link underline underline-offset-2"
                 rel="noopener noreferrer"
               >
                 Cloudflare’s Turnstile privacy policy
