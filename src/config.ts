@@ -9,7 +9,8 @@ export const config = {
     (env.VITE_SUPABASE_URL ? `${env.VITE_SUPABASE_URL.replace(/\/$/, '')}/functions/v1/join-waitlist` : '')
   ).trim(),
   turnstileSiteKey: (env.VITE_TURNSTILE_SITE_KEY ?? '').trim(),
-  contactEmail: (env.VITE_CONTACT_EMAIL ?? '').trim(),
+  // Public contact address (footer + privacy policy). VITE_CONTACT_EMAIL can override it.
+  contactEmail: (env.VITE_CONTACT_EMAIL || 'ellivia.org@gmail.com').trim(),
   baseUrl: env.BASE_URL,
 }
 
