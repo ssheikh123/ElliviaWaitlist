@@ -1,5 +1,24 @@
 import type { ReactNode } from 'react'
-import { ArrowDown, BadgeCheck, Check, ChevronDown, ListChecks, ScanLine, Signpost, X, type LucideIcon } from 'lucide-react'
+import {
+  ArrowDown,
+  ArrowRight,
+  BadgeCheck,
+  BellRing,
+  BookOpen,
+  Building2,
+  Check,
+  ChevronDown,
+  CircleCheck,
+  CircleHelp,
+  FileText,
+  Gavel,
+  ListChecks,
+  ScanLine,
+  ShieldCheck,
+  Signpost,
+  X,
+  type LucideIcon,
+} from 'lucide-react'
 import { SignupForm } from './SignupForm.tsx'
 import { goToSignup } from '../lib/goToSignup.ts'
 import { LaunchPill } from './Nav.tsx'
@@ -101,7 +120,6 @@ export function HowItWorks() {
         <h2 id="how-title" className="max-w-[18ch] text-balance text-[34px] font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-[48px]">
           From a confusing bill to a clear next step.
         </h2>
-        <p className="mt-4 max-w-xl text-lg leading-relaxed text-copy">Three steps, all from your phone.</p>
 
         <ol className="relative mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
           {/* the route connecting the stops */}
@@ -131,70 +149,74 @@ export function HowItWorks() {
 
 /* ----------------------------------------------------------- Why Ellivia */
 
-const withoutGuide = [
-  'The bill arrives with codes you’ve never seen and an amount you didn’t expect.',
-  'You search for help and land on a long policy document full of terms.',
-  'You set the bill aside, unsure if any help applies to you.',
+type FlowStep = { icon: LucideIcon; label: string }
+
+const onItsOwn: FlowStep[] = [
+  { icon: FileText, label: 'Surprise bill' },
+  { icon: BookOpen, label: 'Long policy PDFs' },
+  { icon: CircleHelp, label: 'Not sure what applies' },
 ]
-const withEllivia = [
-  'You scan the bill with your phone.',
-  'You answer a few questions about your household, income, and insurance.',
-  'You see assistance programs that may apply, and where and how to apply.',
+const withEllivia: FlowStep[] = [
+  { icon: ScanLine, label: 'Scan the bill' },
+  { icon: ListChecks, label: 'Answer a few questions' },
+  { icon: CircleCheck, label: 'See where and how to apply' },
 ]
 
 export function WhyEllivia() {
   return (
     <section aria-labelledby="why-title" id="why" className="px-4 py-20 sm:px-6 sm:py-28">
-      <div className="mx-auto max-w-6xl">
-        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
-          <div>
-            <h2 id="why-title" className="max-w-[16ch] text-balance text-[34px] font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-[48px]">
-              Hospital bills can be confusing. Help can be hard to find.
-            </h2>
-          </div>
-          <div className="space-y-4 text-lg leading-relaxed text-copy">
-            <p>
-              Even with insurance, an emergency room visit can lead to a bill you didn’t expect. Many hospitals offer
-              financial assistance, but the details about who may qualify and how to apply are often spread across
-              long documents and websites.
-            </p>
-            <p>
-              Ellivia is designed to make navigating those options easier, starting with bills from RUSH University
-              Medical Center. It’s being developed through Everyone Can Code Chicago’s App Accelerator.
-            </p>
-          </div>
-        </div>
+      <div className="mx-auto max-w-5xl">
+        <h2 id="why-title" className="max-w-[18ch] text-balance text-[34px] font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-[48px]">
+          Hospital bills can be confusing. Help can be hard to find.
+        </h2>
+        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-copy">
+          Ellivia makes financial assistance easier to find, starting with bills from RUSH University Medical Center.
+        </p>
 
-        <div className="mt-14 grid gap-5 md:grid-cols-2">
-          <Story title="The same bill, on its own" items={withoutGuide} tone="plain" />
-          <Story title="The same bill, with Ellivia" items={withEllivia} tone="mint" />
+        <div className="mt-12 space-y-4">
+          <Flow title="On its own" steps={onItsOwn} tone="plain" />
+          <Flow title="With Ellivia" steps={withEllivia} tone="mint" />
         </div>
-        <p className="mt-5 text-[15px] text-muted">
-          An illustrative example. Ellivia can’t guarantee discounts or approval; the hospital makes the final decision.
+        <p className="mt-5 text-[14px] text-muted">
+          Illustrative example. The hospital decides who qualifies. Built through Everyone Can Code Chicago’s App
+          Accelerator.
         </p>
       </div>
     </section>
   )
 }
 
-function Story({ title, items, tone }: { title: string; items: string[]; tone: 'plain' | 'mint' }) {
+function Flow({ title, steps, tone }: { title: string; steps: FlowStep[]; tone: 'plain' | 'mint' }) {
   const mint = tone === 'mint'
   return (
-    <div className={`rounded-[28px] p-6 sm:p-8 ${mint ? 'bg-mint' : 'bg-paper ring-1 ring-line'}`}>
-      <h3 className="text-[22px] font-bold tracking-tight">{title}</h3>
-      <ol className="mt-6 space-y-5">
-        {items.map((text, i) => (
-          <li key={text} className="flex gap-4">
-            <span
-              className={`grid size-8 shrink-0 place-items-center rounded-full text-[14px] font-bold ${
-                mint ? 'bg-ink text-white' : 'bg-azure-2 text-ink'
-              }`}
-            >
-              {i + 1}
-            </span>
-            <p className={`pt-1 leading-relaxed ${mint ? 'text-ink' : 'text-copy'}`}>{text}</p>
-          </li>
-        ))}
+    <div className={`rounded-[28px] px-4 py-6 sm:px-8 sm:py-7 ${mint ? 'bg-mint' : 'bg-paper ring-1 ring-line'}`}>
+      <h3 className="text-[18px] font-bold tracking-tight sm:text-[20px]">{title}</h3>
+      <ol className="mt-5 flex items-start gap-1 sm:gap-4">
+        {steps.map(({ icon: Icon, label }, i) => {
+          const last = i === steps.length - 1
+          return (
+            <li key={label} className="flex flex-1 items-start justify-center gap-1 sm:gap-4">
+              <div className="flex min-w-0 flex-1 flex-col items-center text-center">
+                <span
+                  className={`grid size-14 place-items-center rounded-2xl sm:size-16 ${
+                    mint ? (last ? 'bg-ink text-white' : 'bg-paper text-ink') : last ? 'bg-azure-2 text-muted' : 'bg-azure text-ink'
+                  }`}
+                >
+                  <Icon className="size-7" aria-hidden="true" />
+                </span>
+                <span className={`mt-3 text-[14px] font-semibold leading-snug sm:text-[16px] ${mint ? 'text-ink' : 'text-copy'}`}>
+                  {label}
+                </span>
+              </div>
+              {!last && (
+                <ArrowRight
+                  aria-hidden="true"
+                  className={`mt-4 size-5 shrink-0 sm:mt-5 sm:size-6 ${mint ? 'text-ink' : 'text-muted/60'}`}
+                />
+              )}
+            </li>
+          )
+        })}
       </ol>
     </div>
   )
@@ -210,16 +232,11 @@ const receipt: { item: string; value: string; ok: boolean }[] = [
   { item: 'Ads or tracking cookies', value: 'None', ok: false },
 ]
 
-const promises: { title: string; body: string }[] = [
-  { title: 'Launch updates only', body: 'We use your name and email to tell you when Ellivia launches. We don’t sell them.' },
-  {
-    title: 'Independent from RUSH',
-    body: 'Ellivia is an independent project and is not affiliated with RUSH University Medical Center.',
-  },
-  {
-    title: 'RUSH makes the decisions',
-    body: 'Financial assistance eligibility is decided by RUSH. Ellivia can’t guarantee discounts or approval.',
-  },
+const promises: { icon: LucideIcon; label: string }[] = [
+  { icon: BellRing, label: 'Launch updates only' },
+  { icon: ShieldCheck, label: 'Never sold' },
+  { icon: Building2, label: 'Not affiliated with RUSH' },
+  { icon: Gavel, label: 'RUSH decides who qualifies' },
 ]
 
 export function TrustPrivacy() {
@@ -230,22 +247,19 @@ export function TrustPrivacy() {
           <h2 id="trust-title" className="max-w-[15ch] text-balance text-[34px] font-extrabold leading-[1.05] tracking-[-0.03em] sm:text-[48px]">
             Joining takes just your name and email.
           </h2>
-          <p className="mt-4 max-w-md text-lg leading-relaxed text-copy">
-            Ellivia is free, and this website never asks for your medical or financial information.
-          </p>
-          <ul className="mt-8 space-y-5">
-            {promises.map((p) => (
-              <li key={p.title} className="border-l-4 border-mint-3 pl-4">
-                <h3 className="text-lg font-bold">{p.title}</h3>
-                <p className="mt-1 leading-relaxed text-copy">{p.body}</p>
+          <p className="mt-4 max-w-md text-lg leading-relaxed text-copy">Free, and never your medical or financial info.</p>
+          <ul className="mt-8 grid gap-3 sm:grid-cols-2">
+            {promises.map(({ icon: Icon, label }) => (
+              <li key={label} className="flex items-center gap-3 rounded-2xl bg-paper/80 px-4 py-3 ring-1 ring-line">
+                <Icon className="size-5 shrink-0 text-ink-2" aria-hidden="true" />
+                <span className="text-[15px] font-semibold leading-snug">{label}</span>
               </li>
             ))}
           </ul>
-          <p className="mt-8 text-[16px] text-copy">
+          <p className="mt-6 text-[16px]">
             <a href={privacyHref} className="font-semibold text-link underline underline-offset-4 hover:text-ink">
               Read the privacy policy
-            </a>{' '}
-            for what we collect, how it’s stored, and how to delete it.
+            </a>
           </p>
         </div>
 
@@ -284,24 +298,24 @@ export function TrustPrivacy() {
 /* ------------------------------------------------------------------- FAQ */
 
 const faqs: { q: string; a: ReactNode }[] = [
-  { q: 'Is Ellivia really free?', a: 'Yes. The app will be free to download and use, and joining the waitlist is free.' },
+  { q: 'Is Ellivia really free?', a: 'Yes. Free to download, free to use, and free to join the waitlist.' },
   {
     q: 'Is Ellivia part of RUSH?',
-    a: 'No. Ellivia is an independent project and is not affiliated with, endorsed by, or sponsored by RUSH University Medical Center.',
+    a: 'No. Ellivia is independent and not affiliated with RUSH University Medical Center.',
   },
   {
     q: 'Will Ellivia lower my bill?',
-    a: 'Ellivia can’t promise that. It helps you explore assistance programs that may apply and understand how to apply. The hospital decides who qualifies.',
+    a: 'We can’t promise that. Ellivia shows you programs that may apply and how to apply. The hospital decides.',
   },
   {
     q: 'When does it launch?',
-    a: 'Ellivia is planned for December 2026 on iOS. If you join the waitlist, we’ll email you when it’s available.',
+    a: 'Planned for December 2026 on iOS. We’ll email you when it’s out.',
   },
   {
     q: 'What happens to my name and email?',
     a: (
       <>
-        They’re used only for Ellivia launch updates, and you can ask us to delete them at any time. See the{' '}
+        Only for launch updates. Ask us to delete them anytime. See the{' '}
         <a href={privacyHref} className="font-semibold text-link underline underline-offset-2">
           privacy policy
         </a>

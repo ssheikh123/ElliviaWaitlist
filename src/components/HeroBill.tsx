@@ -17,7 +17,7 @@ const RUSH_FA_URL = 'https://www.rush.edu/patients-visitors/financial-assistance
 
 /**
  * Hero centerpiece: a SAMPLE ER statement (no real hospital or patient) next to a
- * concept of the Ellivia app. "On its own" shows the confusing bill; "With Ellivia"
+ * concept of the Ellivia app. "On its own" shows the full balance; "With Ellivia"
  * shows what RUSH's published financial assistance policy may take off, based on the
  * household size and income range the visitor picks. Nothing picked leaves the page.
  */
@@ -89,11 +89,11 @@ export function HeroBill() {
           </span>
         </div>
 
-        <dl className="mt-3 space-y-2 text-[14px] sm:text-[15px]">
-          <Line label={<Jargon on={!explained}>Level 5 ED visit, CPT 99285</Jargon>} amount="$3,412.00" />
-          <Line label="CT, head without contrast" amount="$2,180.00" />
-          <Line label={<Jargon on={!explained}>Lab panel, rev. code 0300</Jargon>} amount="$486.00" />
-          <Line label={<Jargon on={!explained}>Contractual adjustment</Jargon>} amount="−$2,950.00" />
+        <dl className="mt-3 space-y-2 text-[15px]">
+          <Line label="Level 5 ED visit" amount="$3,412.00" />
+          <Line label="CT scan" amount="$2,180.00" />
+          <Line label="Lab panel" amount="$486.00" />
+          <Line label="Insurance" amount="−$2,950.00" />
         </dl>
 
         <div
@@ -102,14 +102,8 @@ export function HeroBill() {
         >
           <div className="flex items-end justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[13px] font-semibold text-muted">
-                {explained ? (
-                  'Your deductible + coinsurance'
-                ) : (
-                  <Jargon on>Patient responsibility</Jargon>
-                )}
-              </p>
-              <p className="text-[13px] text-muted">{explained ? 'What you may pay' : 'Due in 30 days'}</p>
+              <p className="text-[14px] font-semibold text-ink">{explained ? 'You may pay' : 'Patient responsibility'}</p>
+              <p className="text-[13px] text-muted">{explained ? 'With financial assistance' : 'Due in 30 days'}</p>
             </div>
             <div className="text-right">
               {saving && (
@@ -121,11 +115,10 @@ export function HeroBill() {
             </div>
           </div>
           {saving && (
-            <p className="mt-2 flex flex-wrap items-center gap-2 text-[13px] text-ink">
-              <span className="animate-pop rounded-full bg-ink px-2.5 py-0.5 text-[13px] font-bold text-white">
+            <p className="mt-2">
+              <span className="animate-pop inline-block rounded-full bg-ink px-2.5 py-0.5 text-[13px] font-bold text-white">
                 {estimate.percentOff === 100 ? 'Up to 100% off' : `${estimate.percentOff}% off`}
               </span>
-              <span>with RUSH’s {estimate.program}</span>
             </p>
           )}
         </div>
@@ -136,9 +129,9 @@ export function HeroBill() {
         {explained && (
           <p
             aria-hidden="true"
-            className="absolute bottom-24 left-0 hidden w-[150px] -rotate-3 font-hand text-[23px] leading-[1.05] text-ink-2 sm:block"
+            className="absolute bottom-40 left-2 hidden w-[150px] -rotate-3 font-hand text-[26px] leading-[1.05] text-ink-2 sm:block"
           >
-            Tell Ellivia about your household, see what may be taken off
+            Pick your household
             <svg viewBox="0 0 80 30" className="ml-16 mt-1 h-6 w-16 text-ink-2" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <path d="M2 6c20 18 46 20 72 10" />
               <path d="M64 8l10 8-12 4" />
@@ -159,7 +152,7 @@ export function HeroBill() {
                   <span className="absolute bottom-2 left-2 size-4 border-b-2 border-l-2 border-ink" />
                   <span className="absolute bottom-2 right-2 size-4 border-b-2 border-r-2 border-ink" />
                 </div>
-                <p className="mt-4 text-[14px] font-semibold text-ink">Scan your bill to get started</p>
+                <p className="mt-4 text-[14px] font-semibold text-ink">Scan your bill</p>
               </div>
             )}
           </div>
@@ -167,12 +160,11 @@ export function HeroBill() {
       </div>
 
       <figcaption className="mt-5 text-[13px] leading-relaxed text-muted">
-        Example only, with a sample bill and a concept of the app. Estimates use{' '}
+        Sample bill and concept app. Based on{' '}
         <a href={RUSH_FA_URL} className="font-semibold text-link underline underline-offset-2" rel="noopener noreferrer">
-          RUSH’s Financial Assistance Policy
-        </a>{' '}
-        (effective July 1, 2025) and 2026 federal poverty guidelines. Discounts cover deductibles and coinsurance,
-        not copays, and require an application. RUSH makes the final decision. Nothing you choose here is saved or sent.
+          RUSH’s policy
+        </a>
+        . Covers deductibles and coinsurance, not copays. You must apply, and RUSH decides. Nothing here is saved.
       </figcaption>
     </figure>
   )
@@ -203,7 +195,7 @@ function HouseholdQuestions({
       <p className="text-[15px] font-bold">Your household</p>
 
       <fieldset className="mt-3">
-        <legend className="text-[12px] font-semibold text-muted">People in your home</legend>
+        <legend className="text-[12px] font-semibold text-muted">People at home</legend>
         <div className="mt-1.5 grid grid-cols-6 gap-1">
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <label key={n} className="relative">
@@ -228,7 +220,7 @@ function HouseholdQuestions({
       </fieldset>
 
       <fieldset className="mt-3">
-        <legend className="text-[12px] font-semibold text-muted">Yearly household income</legend>
+        <legend className="text-[12px] font-semibold text-muted">Yearly income</legend>
         <div className="mt-1.5 space-y-1">
           {bands.map((b) => (
             <label key={b.value} className="relative block">
@@ -252,16 +244,13 @@ function HouseholdQuestions({
         {estimate.percentOff > 0 ? (
           <>
             <p className="text-[12px] font-semibold text-muted">You may qualify for</p>
-            <p className="text-[20px] font-extrabold leading-tight">
+            <p className="text-[22px] font-extrabold leading-tight">
               {estimate.percentOff === 100 ? 'Up to 100% off' : '80% off'}
             </p>
-            <p className="text-[12px] leading-snug text-copy">RUSH {estimate.program}. Ellivia shows you how to apply.</p>
+            <p className="text-[12px] text-copy">RUSH {estimate.program}</p>
           </>
         ) : (
-          <p className="text-[12px] leading-snug text-copy">
-            At this income, RUSH’s income-based discounts may not lower this bill. Ellivia can still help you understand
-            your options.
-          </p>
+          <p className="text-[13px] font-semibold leading-snug text-ink">No income-based discount at this income</p>
         )}
       </div>
     </div>
@@ -274,25 +263,5 @@ function Line({ label, amount }: { label: ReactNode; amount: string }) {
       <dt className="min-w-0 text-copy">{label}</dt>
       <dd className="shrink-0 font-semibold tabular-nums">{amount}</dd>
     </div>
-  )
-}
-
-function Jargon({ on, children }: { on: boolean; children: ReactNode }) {
-  return (
-    <span
-      className={`decoration-2 underline-offset-4 transition ${
-        on ? 'underline decoration-[#c0392b]/60 decoration-wavy' : 'no-underline'
-      }`}
-    >
-      {children}
-      {on && (
-        <span
-          aria-hidden="true"
-          className="ml-1 inline-grid size-4 place-items-center rounded-full bg-[#c0392b]/12 align-middle text-[11px] font-bold text-[#a93226]"
-        >
-          ?
-        </span>
-      )}
-    </span>
   )
 }

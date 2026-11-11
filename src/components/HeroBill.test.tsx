@@ -15,20 +15,22 @@ async function openWithEllivia() {
 describe('HeroBill', () => {
   it('is clearly labelled as an example with its sources and limits', () => {
     render(<HeroBill />)
-    const caption = screen.getByText(/example only/i).closest('figcaption')!
-    expect(caption).toHaveTextContent(/sample bill/i)
-    expect(caption).toHaveTextContent(/effective July 1, 2025/i)
+    const caption = screen.getByText(/sample bill and concept app/i).closest('figcaption')!
     expect(caption).toHaveTextContent(/not copays/i)
-    expect(caption).toHaveTextContent(/RUSH makes the final decision/i)
-    expect(caption).toHaveTextContent(/nothing you choose here is saved or sent/i)
+    expect(caption).toHaveTextContent(/you must apply, and RUSH decides/i)
+    expect(caption).toHaveTextContent(/nothing here is saved/i)
+    expect(screen.getByRole('link', { name: /RUSH’s policy/ })).toHaveAttribute('href', expect.stringContaining('rush.edu'))
   })
 
-  it('starts on the confusing bill with the full balance and no discount', () => {
+  it('starts on the plain bill with the full balance and no discount', () => {
     render(<HeroBill />)
     expect(screen.getByRole('radio', { name: 'On its own' })).toHaveAttribute('aria-checked', 'true')
     expect(screen.getByText('$3,128.00')).toBeInTheDocument()
     expect(screen.queryByText(/% off/)).not.toBeInTheDocument()
-    expect(screen.getByText(/scan your bill to get started/i)).toBeInTheDocument()
+    expect(screen.getByText('Patient responsibility')).toBeInTheDocument()
+    expect(screen.getByText('Scan your bill')).toBeInTheDocument()
+    // plain labels, no jargon codes
+    expect(screen.queryByText(/CPT|rev\. code|contractual/i)).not.toBeInTheDocument()
   })
 
   it('defaults to the 80% band for a family of 4 and shows the new amount', async () => {
@@ -52,7 +54,7 @@ describe('HeroBill', () => {
     const user = await openWithEllivia()
     await user.click(screen.getByRole('radio', { name: 'Over $132,000' }))
     expect(screen.queryByText(/% off/)).not.toBeInTheDocument()
-    expect(screen.getByText(/may not lower this bill/i)).toBeInTheDocument()
+    expect(screen.getByText(/no income-based discount/i)).toBeInTheDocument()
     expect(screen.getAllByText('$3,128.00').length).toBeGreaterThan(0)
   })
 
