@@ -48,11 +48,13 @@ export function Hero() {
             {/* the nav hides this label on phones, so show it here instead */}
             <LaunchPill className="inline-flex py-1.5 text-[13px] sm:hidden" />
           </div>
-          <h1
-            id="hero-title"
-            className="mt-6 max-w-[14ch] text-balance text-[44px] font-extrabold leading-[0.98] tracking-[-0.035em] text-ink [font-variation-settings:'wdth'_90] sm:text-[64px] lg:text-[72px]"
-          >
-            Medical bills are stressful. Help shouldn’t be.
+          <h1 id="hero-title" className="mt-6 text-ink [font-variation-settings:'wdth'_90]">
+            <span className="block max-w-[12ch] text-balance text-[44px] font-extrabold leading-[0.98] tracking-[-0.035em] sm:text-[64px] lg:text-[72px]">
+              Medical bills are stressful.
+            </span>{' '}
+            <span className="mt-3 block text-[28px] font-bold leading-[1.1] tracking-[-0.025em] text-ink-2 sm:text-[38px] lg:text-[42px]">
+              Finding help shouldn’t be.
+            </span>
           </h1>
           <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-copy sm:text-xl">
             Find hospital financial assistance you may qualify for, and how to apply.
