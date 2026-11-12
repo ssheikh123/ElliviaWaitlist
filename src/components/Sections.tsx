@@ -52,11 +52,10 @@ export function Hero() {
             id="hero-title"
             className="mt-6 max-w-[14ch] text-balance text-[44px] font-extrabold leading-[0.98] tracking-[-0.035em] text-ink [font-variation-settings:'wdth'_90] sm:text-[64px] lg:text-[72px]"
           >
-            Medical bills are stressful. Finding help shouldn’t be.
+            Medical bills are stressful. Help shouldn’t be.
           </h1>
           <p className="mt-5 max-w-xl text-pretty text-lg leading-relaxed text-copy sm:text-xl">
-            Ellivia helps insured families explore hospital financial assistance and understand how to apply. Coming
-            soon to iOS.
+            Find hospital financial assistance you may qualify for, and how to apply.
           </p>
 
           <JoinCta />
