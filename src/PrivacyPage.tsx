@@ -552,15 +552,6 @@ export default function PrivacyPage() {
             <p>We do not sell or share personal information, and we do not use it for targeted advertising.</p>
           </Section>
 
-          <Section title="Children">
-            <p>
-              Ellivia is meant for adults dealing with a hospital bill. The app and the website are not directed to
-              children under 13, and we do not knowingly collect personal information from children under 13. If you
-              believe a child has joined the waitlist, email us and we will delete their information. A parent or
-              guardian may use Ellivia on behalf of their household.
-            </p>
-          </Section>
-
           <Section title="Changes to this policy">
             <p>
               If we change how Ellivia handles information, we will update this policy and its effective date, and post
