@@ -1,12 +1,17 @@
-/** Ellivia mark: a folded paper corner (the bill) with a green leaf of relief. */
+import logoUrl from '../assets/logo.webp'
+
+/** Ellivia mark: leaves held in an open hand. Decorative; the surrounding link or text names it. */
 export function LogoMark({ className = 'size-8' }: { className?: string }) {
   return (
-    <svg viewBox="0 0 64 64" className={className} aria-hidden="true" focusable="false">
-      <rect width="64" height="64" rx="18" fill="#0f2f45" />
-      <path d="M20 16h18l8 8v24H20z" fill="#eaf6fd" />
-      <path d="M38 16v8h8z" fill="#bde2f7" />
-      <path d="M27 38c0-6 5-10 12-10 0 7-4 12-12 12z" fill="#8fd6ab" />
-    </svg>
+    <img
+      src={logoUrl}
+      alt=""
+      aria-hidden="true"
+      width={32}
+      height={32}
+      decoding="async"
+      className={`shrink-0 rounded-[28%] object-cover ${className}`}
+    />
   )
 }
 
