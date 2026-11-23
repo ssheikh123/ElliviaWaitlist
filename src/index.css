@@ -1,5 +1,5 @@
-@import "@fontsource-variable/nunito/index.css";
-@import "@fontsource-variable/fraunces/soft.css";
+@import "@fontsource-variable/figtree/wght.css";
+@import "@fontsource/gloock/400.css";
 @import "@fontsource/caveat/600.css";
 @import "tailwindcss";
 
@@ -12,8 +12,8 @@
  *   sand = the logo's warm cream, ink = deep forest green for text (WCAG AA on every background).
  */
 @theme {
-  --font-sans: "Nunito Variable", "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --font-display: "Fraunces Variable", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Figtree Variable", "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-display: "Gloock", "Iowan Old Style", Georgia, serif;
   --font-hand: "Caveat", "Bradley Hand", "Segoe Print", cursive;
 
   --color-azure: #f1faf7;
@@ -45,7 +45,7 @@
   --animate-pop: pop 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-rise: rise 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
   --animate-fade: fade 1.2s ease-out both;
-  --animate-slide-left: slide-left 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-drop: drop 1.1s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @keyframes pop {
     from { opacity: 0; transform: scale(0.94); }
@@ -59,9 +59,21 @@
     from { opacity: 0; }
     to { opacity: 1; }
   }
-  @keyframes slide-left {
-    from { opacity: 0; transform: translateX(48px); filter: blur(4px); }
-    to { opacity: 1; transform: none; filter: blur(0); }
+  /* The sample bill falls onto the page and settles, like paper landing on a desk. */
+  @keyframes drop {
+    0% { opacity: 0; transform: translateY(-70px) rotate(-7deg) scale(1.04); }
+    55% { opacity: 1; transform: translateY(6px) rotate(1.5deg); }
+    78% { transform: translateY(-2px) rotate(-0.5deg); }
+    100% { opacity: 1; transform: none; }
+  }
+  @keyframes marker {
+    from { background-size: 0% 100%; }
+    to { background-size: 100% 100%; }
+  }
+  @keyframes stamp {
+    0% { opacity: 0; transform: scale(2.4) rotate(-14deg); }
+    60% { opacity: 1; transform: scale(0.94) rotate(14deg); }
+    100% { opacity: 1; transform: scale(1) rotate(12deg); }
   }
 }
 
@@ -75,11 +87,11 @@
   body {
     @apply bg-azure font-sans text-ink antialiased;
   }
-  /* Headings and the wordmark use Fraunces with its "soft" axis turned all the way up: rounded, warm serifs. */
+  /* Headings and the wordmark use Gloock, a high-contrast display serif. It has one weight (400). */
   h1, h2, .font-display {
     font-family: var(--font-display);
-    font-variation-settings: "SOFT" 100;
-    font-optical-sizing: auto;
+    font-weight: 400;
+    font-synthesis: none;
   }
   /* FAQ answers glide open where the browser supports animating to auto height. */
   :root {
@@ -132,44 +144,73 @@
   }
 
   /*
-   * Scroll reveal. <Reveal> arms an element (hides it) and sets data-shown when it scrolls into view,
-   * so it glides in: up (default), from the left or right, a soft zoom, or a plain fade.
-   * Without JavaScript, or with reduced motion, nothing is ever hidden.
+   * Scroll moments. <Reveal> arms an element (data-armed) and sets data-shown when it scrolls into view.
+   * Each variant is its own effect, used once on the page. Without JavaScript, or with reduced motion,
+   * nothing is armed, so nothing is ever hidden.
    */
-  .reveal[data-armed] {
-    transition:
-      opacity 1s ease var(--reveal-delay, 0ms),
-      transform 1.2s var(--ease-glide) var(--reveal-delay, 0ms),
-      filter 1s ease var(--reveal-delay, 0ms);
-  }
-  .reveal[data-armed]:not([data-shown]) {
-    opacity: 0;
-    filter: blur(6px);
-    transform: translateY(36px);
-  }
-  .reveal[data-armed][data-variant="left"]:not([data-shown]) { transform: translateX(-64px); }
-  .reveal[data-armed][data-variant="right"]:not([data-shown]) { transform: translateX(64px); }
-  .reveal[data-armed][data-variant="zoom"]:not([data-shown]) { transform: scale(0.94); }
-  .reveal[data-armed][data-variant="fade"]:not([data-shown]) { transform: none; }
 
-  /* Word-by-word text: each word drifts up out of a soft blur, one after another. */
-  .reveal-words[data-armed] .word {
-    display: inline-block;
+  /* How it works: the dotted route draws itself, and each stop pops up as the line reaches it. */
+  .reveal[data-variant="route"] .route {
+    transition: clip-path 1.6s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .reveal[data-variant="route"][data-armed]:not([data-shown]) .route {
+    clip-path: inset(0 100% 100% 0);
+  }
+  .reveal[data-variant="route"] .stop {
     transition:
-      opacity 0.9s ease calc(var(--reveal-delay, 0ms) + var(--i) * 70ms),
-      transform 1.1s var(--ease-glide) calc(var(--reveal-delay, 0ms) + var(--i) * 70ms),
-      filter 0.9s ease calc(var(--reveal-delay, 0ms) + var(--i) * 70ms);
+      transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) calc(0.15s + var(--i) * 0.55s),
+      opacity 0.3s ease calc(0.15s + var(--i) * 0.55s);
   }
-  .reveal-words[data-armed]:not([data-shown]) .word {
+  .reveal[data-variant="route"][data-armed]:not([data-shown]) .stop {
+    transform: scale(0) rotate(-25deg);
     opacity: 0;
-    filter: blur(8px);
-    transform: translateY(0.45em);
   }
+
+  /* Why Ellivia: the "With Ellivia" card wipes across, left to right.
+     (The clip goes on the child: a fully clipped element never counts as "in view".) */
+  .reveal[data-variant="wipe"] > * {
+    transition: clip-path 1.1s cubic-bezier(0.77, 0, 0.18, 1) 0.2s;
+  }
+  .reveal[data-variant="wipe"][data-armed]:not([data-shown]) > * {
+    clip-path: inset(0 100% 0 0 round 30px);
+  }
+  .reveal[data-variant="wipe"][data-armed][data-shown] > * {
+    clip-path: inset(0 0 0 0 round 30px);
+  }
+
+  /* Privacy: the receipt prints out from the top, line by line. */
+  .reveal[data-variant="print"] .receipt-paper {
+    transition:
+      clip-path 1.8s steps(14, end) 0.15s,
+      transform 1.8s steps(14, end) 0.15s;
+  }
+  .reveal[data-variant="print"][data-armed]:not([data-shown]) .receipt-paper {
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(-24px);
+  }
+
+  /* Sign up: the postmark slams down like a rubber stamp. */
+  .reveal[data-variant="stamp"][data-armed]:not([data-shown]) .postmark {
+    opacity: 0;
+  }
+  .reveal[data-variant="stamp"][data-armed][data-shown] .postmark {
+    animation: stamp 0.55s cubic-bezier(0.2, 1.5, 0.4, 1) 0.5s both;
+  }
+
   /* The hero headline plays on load instead of on scroll. */
   .words-on-load .word {
     display: inline-block;
     animation: var(--animate-rise);
     animation-delay: calc(var(--start, 0ms) + var(--i) * 80ms);
+  }
+  /* ...then a mint highlighter swipes under the hopeful half of the line. */
+  .marker {
+    background-image: linear-gradient(transparent 58%, var(--color-mint-2) 58%, var(--color-mint-2) 92%, transparent 92%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    animation: marker 0.9s cubic-bezier(0.65, 0, 0.35, 1) var(--start, 1.2s) both;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 }
 

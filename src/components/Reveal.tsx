@@ -1,6 +1,7 @@
 import { useEffect, useRef, type CSSProperties, type ElementType, type ReactNode } from 'react'
 
-export type RevealVariant = 'up' | 'left' | 'right' | 'zoom' | 'fade'
+/** Each variant is a different effect, styled in index.css. */
+export type RevealVariant = 'route' | 'wipe' | 'print' | 'stamp'
 
 /**
  * Arms an element so it is hidden until it scrolls into view, then lets CSS glide it in.
@@ -29,17 +30,17 @@ function useReveal<T extends HTMLElement>() {
   return ref
 }
 
-/** Fades and glides its content in the first time it scrolls into view. */
+/** Plays its variant's effect the first time it scrolls into view. */
 export function Reveal({
   as: Tag = 'div',
-  variant = 'up',
+  variant,
   delay = 0,
   className = '',
   children,
   ...rest
 }: {
   as?: ElementType
-  variant?: RevealVariant
+  variant: RevealVariant
   /** Stagger, in milliseconds. */
   delay?: number
   className?: string
@@ -74,27 +75,5 @@ export function Words({ text, start = 0 }: { text: string; start?: number }) {
         </span>
       ))}
     </>
-  )
-}
-
-/** A heading (or any text) whose words drift up one after another as it scrolls into view. */
-export function RevealText({
-  as: Tag = 'h2',
-  text,
-  delay = 0,
-  className = '',
-  id,
-}: {
-  as?: ElementType
-  text: string
-  delay?: number
-  className?: string
-  id?: string
-}) {
-  const ref = useReveal<HTMLElement>()
-  return (
-    <Tag ref={ref} id={id} className={`reveal-words ${className}`} style={{ '--reveal-delay': `${delay}ms` } as CSSProperties}>
-      <Words text={text} />
-    </Tag>
   )
 }

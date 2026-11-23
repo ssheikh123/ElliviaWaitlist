@@ -39,7 +39,8 @@ export const en = {
   hero: {
     badge: 'Launching this December',
     titleA: 'Medical bills are stressful.',
-    titleB: 'Finding help shouldn’t be.',
+    /** Second line, split so the hopeful half can be highlighted. */
+    titleB: ['Finding help', 'shouldn’t be.'] as [string, string],
     intro: 'Find hospital financial assistance you may qualify for, and how to apply.',
     cta: 'Save my free spot',
     hand: 'It takes less than a minute!',
@@ -223,7 +224,7 @@ export const es: Strings = {
   hero: {
     badge: 'Llega este diciembre',
     titleA: 'Las facturas médicas son estresantes.',
-    titleB: 'Encontrar ayuda no tiene por qué serlo.',
+    titleB: ['Encontrar ayuda', 'no tiene por qué serlo.'],
     intro: 'Descubra la asistencia financiera del hospital para la que podría calificar y cómo solicitarla.',
     cta: 'Reservar mi lugar gratis',
     hand: '¡Toma menos de un minuto!',

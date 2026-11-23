@@ -99,7 +99,7 @@ export function Nav() {
             aria-label={t.nav.home}
           >
             <LogoMark className="size-11 sm:size-14" />
-            <span className="font-display text-[27px] font-semibold tracking-[-0.01em] sm:text-[33px]" aria-hidden="true">
+            <span className="font-display text-[27px] tracking-[-0.005em] sm:text-[33px]" aria-hidden="true">
               Ellivia
             </span>
           </a>
