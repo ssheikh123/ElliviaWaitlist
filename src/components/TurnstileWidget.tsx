@@ -5,6 +5,8 @@ import { config } from '../config.ts'
 export interface TurnstileWidgetProps {
   /** Increment to force a fresh challenge (tokens are single-use). */
   resetKey: number
+  /** Language for Cloudflare's widget. Changing it needs a remount (give the widget a `key`). */
+  language?: string
   onToken: (token: string) => void
   onExpire: () => void
   onError: (kind: 'load' | 'challenge') => void
@@ -14,7 +16,7 @@ export interface TurnstileWidgetProps {
  * Cloudflare Turnstile in Managed mode. Most visitors pass automatically;
  * Cloudflare shows a checkbox only when it needs more signal.
  */
-export function TurnstileWidget({ resetKey, onToken, onExpire, onError }: TurnstileWidgetProps) {
+export function TurnstileWidget({ resetKey, language = 'auto', onToken, onExpire, onError }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const widgetIdRef = useRef<string | null>(null)
   const handlers = useRef({ onToken, onExpire, onError })
@@ -30,6 +32,7 @@ export function TurnstileWidget({ resetKey, onToken, onExpire, onError }: Turnst
           action: 'join_waitlist',
           theme: 'light',
           size: 'flexible',
+          language,
           'response-field': false,
           'refresh-expired': 'auto',
           callback: (token) => handlers.current.onToken(token),
@@ -49,6 +52,7 @@ export function TurnstileWidget({ resetKey, onToken, onExpire, onError }: Turnst
         widgetIdRef.current = null
       }
     }
+    // A language change remounts the widget through its `key`, so this runs once per mount.
   }, [])
 
   useEffect(() => {

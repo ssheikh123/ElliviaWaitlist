@@ -38,13 +38,21 @@ The website is fully static. The only server-side code is the Edge Function.
 | `index.html`, `privacy/index.html`, `404.html` | Page entry points (multi-page Vite build) |
 | `src/components/` | Nav, hero, sections, footer, `SignupForm`, `TurnstileWidget`, CSS phone preview |
 | `src/lib/` | `waitlistApi.ts` (fetch + error messages), `referral.ts` (first-touch `?ref=`), `turnstile.ts` (loader) |
-| `src/PrivacyPage.tsx` | Privacy policy |
+| `src/i18n/` | English and Spanish interface text (`strings.ts`) and the language switch logic (`lang.tsx`) |
+| `src/PrivacyPage.tsx`, `src/privacy/` | Privacy policy page; text in `PolicyEn.tsx` and its Spanish translation `PolicyEs.tsx` |
 | `supabase/functions/_shared/waitlist-rules.ts` | Email/referral validation shared by browser **and** server |
 | `supabase/functions/join-waitlist/` | `index.ts` (Deno entry), `handler.ts` (logic), `turnstile.ts` (Siteverify) |
 | `supabase/migrations/` | Database schema, RLS, grants, rate limiting, pg_cron cleanup |
 | `supabase/tests/waitlist_db.test.sql` | Database tests (run in a transaction, rolled back) |
 | `tests/functions/` | Edge Function unit tests (Vitest, Node) |
 | `.github/workflows/deploy.yml` | Build, test, deploy to GitHub Pages on push to `main` |
+
+## Languages
+
+The site and privacy policy are in English and Spanish. The language comes from `?lang=en|es` (set by the
+switch in the top bar and carried on internal links), otherwise from the browser's language. Nothing about the
+choice is stored. To change wording, edit both languages in `src/i18n/strings.ts`; a missing Spanish string
+fails the typecheck. Privacy policy changes go in both `src/privacy/PolicyEn.tsx` and `PolicyEs.tsx`.
 
 ## Configuration
 

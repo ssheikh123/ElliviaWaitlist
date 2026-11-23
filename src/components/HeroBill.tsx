@@ -7,6 +7,7 @@ import {
   incomeBands,
   type IncomeBand,
 } from '../lib/rushAssistance.ts'
+import { useLang } from '../i18n/lang.tsx'
 
 type Mode = 'before' | 'with'
 
@@ -22,6 +23,7 @@ const RUSH_FA_URL = 'https://www.rush.edu/patients-visitors/financial-assistance
  * household size and income range the visitor picks. Nothing picked leaves the page.
  */
 export function HeroBill() {
+  const { t } = useLang()
   const [mode, setMode] = useState<Mode>('before')
   const [size, setSize] = useState(4)
   const [band, setBand] = useState<IncomeBand>('300-400')
@@ -47,16 +49,16 @@ export function HeroBill() {
   const saving = explained && estimate.percentOff > 0
 
   return (
-    <figure className="relative mx-auto w-full max-w-[470px] pt-2">
+    <figure className="relative mx-auto w-full max-w-[500px] pt-2">
       <div
         role="radiogroup"
-        aria-label="Show the sample bill"
-        className="relative z-20 mx-auto mb-6 flex w-fit rounded-full bg-paper/80 p-1 shadow-soft ring-1 ring-line backdrop-blur"
+        aria-label={t.bill.toggle}
+        className="relative z-20 mx-auto mb-8 flex w-fit rounded-full bg-paper/80 p-1 shadow-soft ring-1 ring-line backdrop-blur"
       >
         {(
           [
-            ['before', 'On its own'],
-            ['with', 'With Ellivia'],
+            ['before', t.bill.before],
+            ['with', t.bill.with],
           ] as const
         ).map(([value, label]) => (
           <button
@@ -65,7 +67,7 @@ export function HeroBill() {
             role="radio"
             aria-checked={mode === value}
             onClick={() => choose(value)}
-            className={`rounded-full px-4 py-2 text-[15px] font-semibold transition ${
+            className={`rounded-full px-5 py-2.5 text-[15px] font-semibold transition ${
               mode === value ? 'bg-ink text-white' : 'text-ink hover:bg-azure'
             }`}
           >
@@ -75,35 +77,34 @@ export function HeroBill() {
       </div>
 
       {/* The paper bill */}
-      <div className="relative z-10 -rotate-2 rounded-[6px] bg-paper px-5 pb-5 pt-5 text-ink shadow-paper sm:px-7 sm:pt-6">
-        <div className="flex items-start justify-between gap-3 border-b-2 border-dashed border-line pb-4">
+      <div className="relative z-10 -rotate-2 rounded-[8px] bg-paper px-6 pb-6 pt-6 text-ink shadow-paper sm:px-8 sm:pb-7 sm:pt-7">
+        <div className="flex items-start justify-between gap-3 border-b-2 border-dashed border-line pb-5">
           <div>
-            <p className="text-[13px] font-semibold text-muted">Emergency Department</p>
-            <p className="text-lg font-bold tracking-tight">Patient statement</p>
+            <p className="text-[13px] font-semibold text-muted">{t.bill.department}</p>
+            <p className="mt-0.5 text-lg font-bold tracking-tight">{t.bill.statement}</p>
           </div>
           <span
             aria-hidden="true"
             className="rotate-6 rounded-md border-2 border-[#c0392b]/70 px-2 py-0.5 text-[13px] font-extrabold tracking-wider text-[#a93226]"
           >
-            SAMPLE
+            {t.bill.stamp}
           </span>
         </div>
 
-        <dl className="mt-3 space-y-2 text-[15px]">
-          <Line label="Level 5 ED visit" amount="$3,412.00" />
-          <Line label="CT scan" amount="$2,180.00" />
-          <Line label="Lab panel" amount="$486.00" />
-          <Line label="Insurance" amount="−$2,950.00" />
+        <dl className="mt-5 space-y-3.5 text-[15px]">
+          {['$3,412.00', '$2,180.00', '$486.00', '−$2,950.00'].map((amount, i) => (
+            <Line key={amount} label={t.bill.lines[i]} amount={amount} />
+          ))}
         </dl>
 
         <div
-          className={`mt-4 rounded-lg px-3 py-3 transition-colors duration-500 ${saving ? 'bg-mint' : 'bg-azure'}`}
+          className={`mt-6 rounded-xl px-4 py-4 transition-colors duration-500 ${saving ? 'bg-mint' : 'bg-azure'}`}
           aria-live="polite"
         >
           <div className="flex items-end justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-[14px] font-semibold text-ink">{explained ? 'You may pay' : 'Patient responsibility'}</p>
-              <p className="text-[13px] text-muted">{explained ? 'With financial assistance' : 'Due in 30 days'}</p>
+              <p className="text-[14px] font-semibold text-ink">{explained ? t.bill.mayPay : t.bill.responsibility}</p>
+              <p className="mt-0.5 text-[13px] text-muted">{explained ? t.bill.withAssistance : t.bill.due}</p>
             </div>
             <div className="text-right">
               {saving && (
@@ -115,9 +116,9 @@ export function HeroBill() {
             </div>
           </div>
           {saving && (
-            <p className="mt-2">
-              <span className="animate-pop inline-block rounded-full bg-ink px-2.5 py-0.5 text-[13px] font-bold text-white">
-                {estimate.percentOff === 100 ? 'Up to 100% off' : `${estimate.percentOff}% off`}
+            <p className="mt-3">
+              <span className="animate-pop inline-block rounded-full bg-ink px-3 py-1 text-[13px] font-bold text-white">
+                {estimate.percentOff === 100 ? t.bill.upTo100 : t.bill.percentOff(estimate.percentOff)}
               </span>
             </p>
           )}
@@ -125,13 +126,13 @@ export function HeroBill() {
       </div>
 
       {/* Concept app */}
-      <div className="relative z-20 -mt-2 flex items-end justify-center sm:-mt-1 sm:justify-end">
+      <div className="relative z-20 mt-4 flex items-end justify-center sm:mt-3 sm:justify-end">
         {explained && (
           <p
             aria-hidden="true"
             className="absolute bottom-40 left-2 hidden w-[150px] -rotate-3 font-hand text-[26px] leading-[1.05] text-ink-2 sm:block"
           >
-            Pick your household
+            {t.bill.pickHousehold}
             <svg viewBox="0 0 80 30" className="ml-16 mt-1 h-6 w-16 text-ink-2" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <path d="M2 6c20 18 46 20 72 10" />
               <path d="M64 8l10 8-12 4" />
@@ -152,19 +153,19 @@ export function HeroBill() {
                   <span className="absolute bottom-2 left-2 size-4 border-b-2 border-l-2 border-ink" />
                   <span className="absolute bottom-2 right-2 size-4 border-b-2 border-r-2 border-ink" />
                 </div>
-                <p className="mt-4 text-[14px] font-semibold text-ink">Scan your bill</p>
+                <p className="mt-4 text-[14px] font-semibold text-ink">{t.bill.scan}</p>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      <figcaption className="mt-5 text-[13px] leading-relaxed text-muted">
-        Sample bill and concept app. Based on{' '}
+      <figcaption className="mt-7 text-[13px] leading-relaxed text-muted">
+        {t.bill.captionBefore}
         <a href={RUSH_FA_URL} className="font-semibold text-link underline underline-offset-2" rel="noopener noreferrer">
-          RUSH’s policy
+          {t.bill.captionLink}
         </a>
-        . Covers deductibles and coinsurance, not copays. You must apply, and RUSH decides. Nothing here is saved.
+        {t.bill.captionAfter}
       </figcaption>
     </figure>
   )
@@ -182,20 +183,21 @@ function HouseholdQuestions({
   setBand: (b: IncomeBand) => void
 }) {
   const uid = useId()
+  const { t } = useLang()
   const { upTo300, upTo400 } = incomeBands(size)
   const bands: { value: IncomeBand; label: string }[] = [
-    { value: 'up-to-300', label: `Up to ${formatWhole(upTo300)}` },
+    { value: 'up-to-300', label: t.bill.upTo(formatWhole(upTo300)) },
     { value: '300-400', label: `${formatWhole(upTo300 + 1)} – ${formatWhole(upTo400)}` },
-    { value: 'over-400', label: `Over ${formatWhole(upTo400)}` },
+    { value: 'over-400', label: t.bill.over(formatWhole(upTo400)) },
   ]
   const estimate = estimateAssistance(band, BALANCE)
 
   return (
     <div className="animate-pop text-ink">
-      <p className="text-[15px] font-bold">Your household</p>
+      <p className="text-[15px] font-bold">{t.bill.household}</p>
 
       <fieldset className="mt-3">
-        <legend className="text-[12px] font-semibold text-muted">People at home</legend>
+        <legend className="text-[12px] font-semibold text-muted">{t.bill.people}</legend>
         <div className="mt-1.5 grid grid-cols-6 gap-1">
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <label key={n} className="relative">
@@ -205,7 +207,7 @@ function HouseholdQuestions({
                 value={n}
                 checked={size === n}
                 onChange={() => setSize(n)}
-                aria-label={`${n} ${n === 1 ? 'person' : 'people'}`}
+                aria-label={t.bill.person(n)}
                 className="peer sr-only"
               />
               <span
@@ -220,7 +222,7 @@ function HouseholdQuestions({
       </fieldset>
 
       <fieldset className="mt-3">
-        <legend className="text-[12px] font-semibold text-muted">Yearly income</legend>
+        <legend className="text-[12px] font-semibold text-muted">{t.bill.income}</legend>
         <div className="mt-1.5 space-y-1">
           {bands.map((b) => (
             <label key={b.value} className="relative block">
@@ -243,14 +245,14 @@ function HouseholdQuestions({
       <div className="mt-3 rounded-xl bg-paper px-3 py-2.5 ring-1 ring-line" aria-live="polite">
         {estimate.percentOff > 0 ? (
           <>
-            <p className="text-[12px] font-semibold text-muted">You may qualify for</p>
+            <p className="text-[12px] font-semibold text-muted">{t.bill.mayQualify}</p>
             <p className="text-[22px] font-extrabold leading-tight">
-              {estimate.percentOff === 100 ? 'Up to 100% off' : '80% off'}
+              {estimate.percentOff === 100 ? t.bill.upTo100 : t.bill.percentOff(estimate.percentOff)}
             </p>
-            <p className="text-[12px] text-copy">RUSH {estimate.program}</p>
+            <p className="text-[12px] text-copy">{t.bill.program(estimate.program ?? '')}</p>
           </>
         ) : (
-          <p className="text-[13px] font-semibold leading-snug text-ink">No income-based discount at this income</p>
+          <p className="text-[13px] font-semibold leading-snug text-ink">{t.bill.noDiscount}</p>
         )}
       </div>
     </div>

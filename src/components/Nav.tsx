@@ -1,15 +1,37 @@
 import { useEffect, useId, useState } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Languages, Menu, X } from 'lucide-react'
 import { LogoMark } from './Logo.tsx'
 import { homeHref } from '../config.ts'
 import { goToSignup } from '../lib/goToSignup.ts'
+import { useLang, withLang, type Lang } from '../i18n/lang.tsx'
 
-export const NAV_LINKS = [
-  { href: '#how-it-works', label: 'How it works' },
-  { href: '#why', label: 'Why Ellivia' },
-  { href: '#privacy', label: 'Privacy' },
-  { href: '#faq', label: 'FAQ' },
+const NAV_LINKS = [
+  { href: '#how-it-works', key: 'how' },
+  { href: '#why', key: 'why' },
+  { href: '#privacy', key: 'privacy' },
+  { href: '#faq', key: 'faq' },
 ] as const
+
+/** Switches between English and Spanish. Shows the other language, written in that language. */
+export function LanguageSwitch({ className = '' }: { className?: string }) {
+  const { t, setLang } = useLang()
+  const target = t.nav.switchTo
+  return (
+    <button
+      type="button"
+      lang={target.lang}
+      onClick={() => setLang(target.lang as Lang)}
+      title={target.aria}
+      className={`inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-3 text-[15px] font-bold text-ink ring-1 ring-ink/15 transition hover:bg-paper/80 ${className}`}
+    >
+      <Languages className="size-[18px]" aria-hidden="true" />
+      <span aria-hidden="true" className="sm:hidden">
+        {target.short}
+      </span>
+      <span className="sr-only sm:not-sr-only">{target.label}</span>
+    </button>
+  )
+}
 
 /**
  * App Store icon, drawn inline so it renders on every device: a blue rounded
@@ -37,16 +59,17 @@ function AppStoreIcon({ className = 'size-4' }: { className?: string }) {
 }
 
 export function LaunchPill({ className = '' }: { className?: string }) {
+  const { t } = useLang()
   return (
     <span
       className={`shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-baby px-2.5 py-1 text-[12px] font-semibold text-ink ${className}`}
     >
       <span aria-hidden="true" className="inline-flex items-center gap-1">
-        Live on the
+        {t.nav.launchBefore}
         <AppStoreIcon className="size-4" />
-        soon
+        {t.nav.launchAfter}
       </span>
-      <span className="sr-only">Live on the App Store soon</span>
+      <span className="sr-only">{t.nav.launchSr}</span>
     </span>
   )
 }
@@ -54,6 +77,7 @@ export function LaunchPill({ className = '' }: { className?: string }) {
 export function Nav() {
   const [open, setOpen] = useState(false)
   const menuId = useId()
+  const { t, lang } = useLang()
 
   useEffect(() => {
     if (!open) return
@@ -64,39 +88,47 @@ export function Nav() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line/80 bg-azure/85 pt-[env(safe-area-inset-top)] backdrop-blur-xl backdrop-saturate-150">
-      <nav aria-label="Main" className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3">
-          <a href={homeHref} className="inline-flex shrink-0 items-center gap-2 rounded-lg text-ink sm:gap-2.5" aria-label="Ellivia home">
-            <LogoMark className="size-8" />
-            <span className="text-[20px] font-extrabold tracking-[-0.03em] sm:text-[22px]" aria-hidden="true">
+      <nav
+        aria-label={t.nav.main}
+        className="mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-2 px-4 sm:h-[88px] sm:gap-3 sm:px-6"
+      >
+        <div className="flex min-w-0 items-center gap-4">
+          <a
+            href={withLang(homeHref, lang)}
+            className="inline-flex shrink-0 items-center gap-2.5 rounded-xl text-ink sm:gap-3"
+            aria-label={t.nav.home}
+          >
+            <LogoMark className="size-11 sm:size-14" />
+            <span className="text-[26px] font-extrabold tracking-[-0.02em] sm:text-[32px]" aria-hidden="true">
               Ellivia
             </span>
           </a>
-          <LaunchPill className="hidden sm:inline-flex" />
+          <LaunchPill className="hidden md:inline-flex" />
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-2">
-          <ul className="hidden items-center gap-1 lg:flex">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <ul className="hidden items-center gap-1 xl:flex">
             {NAV_LINKS.map((l) => (
               <li key={l.href}>
                 <a
                   href={l.href}
-                  className="rounded-full px-3 py-2 text-[15px] font-semibold text-ink transition hover:bg-paper/80"
+                  className="rounded-full px-3.5 py-2.5 text-[16px] font-semibold text-ink transition hover:bg-paper/80"
                 >
-                  {l.label}
+                  {t.nav.links[l.key]}
                 </a>
               </li>
             ))}
           </ul>
+          <LanguageSwitch />
           <button
             type="button"
             aria-expanded={open}
             aria-controls={menuId}
             onClick={() => setOpen((o) => !o)}
-            className="grid size-10 place-items-center rounded-full text-ink transition hover:bg-paper/80 lg:hidden"
+            className="grid size-11 place-items-center rounded-full text-ink transition hover:bg-paper/80 xl:hidden"
           >
-            {open ? <X className="size-5" aria-hidden="true" /> : <Menu className="size-5" aria-hidden="true" />}
-            <span className="sr-only">{open ? 'Close menu' : 'Open menu'}</span>
+            {open ? <X className="size-6" aria-hidden="true" /> : <Menu className="size-6" aria-hidden="true" />}
+            <span className="sr-only">{open ? t.nav.closeMenu : t.nav.openMenu}</span>
           </button>
           <a
             href="#join"
@@ -104,23 +136,24 @@ export function Nav() {
               setOpen(false)
               goToSignup(e)
             }}
-            className="inline-flex h-10 shrink-0 items-center whitespace-nowrap rounded-full bg-ink px-4 text-[15px] font-semibold text-white transition hover:bg-ink-2 active:scale-[0.98]"
+            className="inline-flex h-11 shrink-0 items-center whitespace-nowrap rounded-full bg-ink px-4 text-[15px] font-bold text-white transition hover:bg-ink-2 active:scale-[0.98] sm:h-12 sm:px-5 sm:text-[16px]"
           >
-            Join Waitlist
+            <span className="sm:hidden">{t.nav.joinShort}</span>
+            <span className="hidden sm:inline">{t.nav.join}</span>
           </a>
         </div>
       </nav>
 
-      <div id={menuId} hidden={!open} className="border-t border-line/80 bg-azure/95 lg:hidden">
+      <div id={menuId} hidden={!open} className="border-t border-line/80 bg-azure/95 xl:hidden">
         <ul className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
           {NAV_LINKS.map((l) => (
             <li key={l.href}>
               <a
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="block rounded-xl px-3 py-3 text-[17px] font-semibold text-ink hover:bg-paper/80"
+                className="block rounded-xl px-3 py-3.5 text-[18px] font-semibold text-ink hover:bg-paper/80"
               >
-                {l.label}
+                {t.nav.links[l.key]}
               </a>
             </li>
           ))}

@@ -1,49 +1,54 @@
-@import "@fontsource-variable/bricolage-grotesque/opsz.css";
+@import "@fontsource-variable/nunito/index.css";
 @import "@fontsource/caveat/600.css";
 @import "tailwindcss";
 
 /*
- * Ellivia design tokens
- * Light azure paper-and-sky backdrop, pastel green + baby blue accents,
- * deep blue "ink" for text so everything stays readable (WCAG AA).
+ * Ellivia design tokens, taken from the logo / app icon:
+ *   aqua circle  #d3f8fa  ·  sage leaves  #9cb886  ·  forest-green hand line  #0b5a14
+ *   cream → mint backdrop  #f3e2c4 → #c4eedb
+ * Token names are kept from the first design so components don't churn:
+ *   azure = soft aqua page background, baby = aqua accent, mint = sage/mint accent,
+ *   sand = the logo's warm cream, ink = deep forest green for text (WCAG AA on every background).
  */
 @theme {
-  --font-sans: "Bricolage Grotesque Variable", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Nunito Variable", "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --font-hand: "Caveat", "Bradley Hand", "Segoe Print", cursive;
 
-  --color-azure: #eaf6fd;
-  --color-azure-2: #dbeffb;
-  --color-baby: #bde2f7;
-  --color-baby-2: #9fd3f2;
-  --color-mint: #cbefd8;
-  --color-mint-2: #a9e3c0;
-  --color-mint-3: #8fd6ab;
+  --color-azure: #f1faf7;
+  --color-azure-2: #e0f4ef;
+  --color-baby: #d3f4f4;
+  --color-baby-2: #a9e2e2;
+  --color-mint: #dcefd6;
+  --color-mint-2: #bfdcae;
+  --color-mint-3: #a5cc8f;
+  --color-sage: #9cb886;
+  --color-sand: #f6ead3;
   --color-paper: #ffffff;
-  --color-ink: #0f2f45;
-  --color-ink-2: #1b4560;
-  --color-copy: #3a5567;
-  --color-muted: #4a6475;
-  --color-line: #cde2ef;
-  --color-link: #11607d;
+  --color-ink: #173f2a;
+  --color-ink-2: #245a3b;
+  --color-copy: #3b5646;
+  --color-muted: #4b6455;
+  --color-line: #d4e7dc;
+  --color-link: #1c6a3b;
   --color-success: #166a43;
-  --color-success-soft: #e3f7ea;
+  --color-success-soft: #e3f5e6;
   --color-danger: #b42318;
   --color-danger-soft: #fdecea;
 
-  --shadow-paper: 0 1px 1px rgb(15 47 69 / 0.06), 0 18px 40px -18px rgb(15 47 69 / 0.28);
-  --shadow-soft: 0 1px 2px rgb(15 47 69 / 0.05), 0 10px 26px -14px rgb(15 47 69 / 0.22);
-  --shadow-phone: 0 30px 60px -24px rgb(15 47 69 / 0.45);
+  --shadow-paper: 0 1px 1px rgb(23 63 42 / 0.06), 0 22px 44px -20px rgb(23 63 42 / 0.28);
+  --shadow-soft: 0 1px 2px rgb(23 63 42 / 0.05), 0 12px 28px -16px rgb(23 63 42 / 0.22);
+  --shadow-phone: 0 30px 60px -24px rgb(23 63 42 / 0.45);
 
-  --animate-pop: pop 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
-  --animate-stick: stick 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+  --animate-pop: pop 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+  --animate-rise: rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 
   @keyframes pop {
-    from { opacity: 0; transform: scale(0.96); }
+    from { opacity: 0; transform: scale(0.94); }
     to { opacity: 1; transform: none; }
   }
-  @keyframes stick {
-    from { opacity: 0; transform: translateY(-10px) rotate(var(--tilt, 0deg)) scale(1.08); }
-    to { opacity: 1; transform: rotate(var(--tilt, 0deg)); }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(22px) scale(0.98); filter: blur(4px); }
+    to { opacity: 1; transform: none; filter: none; }
   }
 }
 
@@ -52,11 +57,10 @@
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: 6.5rem;
   }
   body {
     @apply bg-azure font-sans text-ink antialiased;
-    font-optical-sizing: auto;
   }
   ::selection {
     background: var(--color-mint-2);
@@ -70,20 +74,35 @@
 }
 
 @layer components {
-  /* Soft sky texture: a faint dot grid like graph paper. */
+  /* Soft texture: a faint dot grid like graph paper. */
   .sky-grid {
-    background-image: radial-gradient(rgb(15 47 69 / 0.07) 1px, transparent 1.2px);
-    background-size: 22px 22px;
+    background-image: radial-gradient(rgb(23 63 42 / 0.06) 1px, transparent 1.2px);
+    background-size: 24px 24px;
+  }
+  /* The logo's cream-to-mint wash. */
+  .logo-wash {
+    background-image: linear-gradient(135deg, var(--color-sand) 0%, var(--color-azure) 45%, #d6f2e6 100%);
   }
   /* Torn receipt edge. */
   .receipt-edge {
     --tooth: 14px;
     mask: conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / var(--tooth) 100%;
   }
-  .dotted-route {
-    background-image: radial-gradient(circle, var(--color-ink) 1.6px, transparent 2px);
-    background-size: 12px 12px;
-    opacity: 0.35;
+
+  /*
+   * Scroll reveal: text and cards float up and pop into place as they come into view.
+   * <Reveal> sets data-shown once the element is on screen; without it the element is fully visible.
+   */
+  .reveal[data-armed]:not([data-shown]) {
+    opacity: 0;
+    transform: translateY(26px) scale(0.97);
+    filter: blur(3px);
+  }
+  .reveal[data-armed] {
+    transition:
+      opacity 0.7s ease var(--reveal-delay, 0ms),
+      transform 0.8s cubic-bezier(0.2, 0.9, 0.25, 1.15) var(--reveal-delay, 0ms),
+      filter 0.7s ease var(--reveal-delay, 0ms);
   }
 }
 
@@ -91,7 +110,9 @@
   html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
   }
 }

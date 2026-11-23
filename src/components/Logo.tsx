@@ -7,19 +7,21 @@ export function LogoMark({ className = 'size-8' }: { className?: string }) {
       src={logoUrl}
       alt=""
       aria-hidden="true"
-      width={32}
-      height={32}
+      width={56}
+      height={56}
       decoding="async"
       className={`shrink-0 rounded-[28%] object-cover ${className}`}
     />
   )
 }
 
-export function Wordmark({ className = '' }: { className?: string }) {
+export function Wordmark({ className = '', large = false }: { className?: string; large?: boolean }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 text-ink ${className}`}>
-      <LogoMark className="size-8" />
-      <span className="text-[22px] font-extrabold tracking-[-0.03em]">Ellivia</span>
+    <span className={`inline-flex items-center text-ink ${large ? 'gap-3' : 'gap-2.5'} ${className}`}>
+      <LogoMark className={large ? 'size-11 sm:size-14' : 'size-10'} />
+      <span className={`font-extrabold tracking-[-0.02em] ${large ? 'text-[26px] sm:text-[32px]' : 'text-[24px]'}`}>
+        Ellivia
+      </span>
     </span>
   )
 }

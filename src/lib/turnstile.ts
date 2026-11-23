@@ -5,6 +5,8 @@ export interface TurnstileRenderOptions {
   action?: string
   theme?: 'light' | 'dark' | 'auto'
   size?: 'normal' | 'flexible' | 'compact'
+  /** Widget language, e.g. 'en' or 'es'. */
+  language?: string
   appearance?: 'always' | 'execute' | 'interaction-only'
   'response-field'?: boolean
   'refresh-expired'?: 'auto' | 'manual' | 'never'

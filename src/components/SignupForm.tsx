@@ -6,10 +6,11 @@ import {
   normalizeEmail,
   normalizeName,
 } from '../../supabase/functions/_shared/waitlist-rules.ts'
-import { ERROR_MESSAGES, submitWaitlist } from '../lib/waitlistApi.ts'
+import { submitWaitlist } from '../lib/waitlistApi.ts'
 import { getStoredReferral } from '../lib/referral.ts'
 import { config, isSignupConfigured, privacyHref } from '../config.ts'
 import { TurnstileWidget } from './TurnstileWidget.tsx'
+import { useLang, withLang } from '../i18n/lang.tsx'
 
 type Status = 'idle' | 'submitting' | 'success'
 type Field = 'name' | 'email'
@@ -26,6 +27,8 @@ interface Errors {
 export const SIGNUP_FIRST_FIELD_ID = 'waitlist-name'
 
 export function SignupForm() {
+  const { t, lang } = useLang()
+  const ERROR_MESSAGES = t.form.errors
   const uid = useId()
   const ids = {
     name: SIGNUP_FIRST_FIELD_ID,
@@ -89,16 +92,14 @@ export function SignupForm() {
     setToken(null)
   }, [])
 
-  const handleCaptchaError = useCallback((kind: 'load' | 'challenge') => {
-    setToken(null)
-    setErrors((e) => ({
-      ...e,
-      captcha:
-        kind === 'load'
-          ? 'The security check couldn’t load. Please disable content blockers for this page or try another browser.'
-          : 'The security check ran into a problem. It will retry automatically. If it keeps failing, refresh the page.',
-    }))
-  }, [])
+  const { captchaLoad, captchaChallenge } = t.form
+  const handleCaptchaError = useCallback(
+    (kind: 'load' | 'challenge') => {
+      setToken(null)
+      setErrors((e) => ({ ...e, captcha: kind === 'load' ? captchaLoad : captchaChallenge }))
+    },
+    [captchaLoad, captchaChallenge],
+  )
 
   const update = (field: Field, value: string) => {
     setValues((v) => ({ ...v, [field]: value }))
@@ -112,9 +113,9 @@ export function SignupForm() {
     const name = normalizeName(values.name)
     const email = normalizeEmail(values.email)
     const next: Errors = {}
-    if (!name) next.name = 'Please enter your name.'
+    if (!name) next.name = t.form.nameRequired
     else if (!isValidName(name)) next.name = ERROR_MESSAGES.invalid_name
-    if (!email) next.email = 'Please enter your email address.'
+    if (!email) next.email = t.form.emailRequired
     else if (!isValidEmail(email)) next.email = ERROR_MESSAGES.invalid_email
     if (!consent) next.consent = ERROR_MESSAGES.consent_required
     // A load/challenge error is shown as-is; otherwise we simply wait for Turnstile.
@@ -183,7 +184,7 @@ export function SignupForm() {
   if (!isSignupConfigured) {
     return (
       <div role="status" className="rounded-2xl border border-line bg-azure p-5 text-sm text-copy">
-        The waitlist form isn’t configured yet. Please check back soon.
+        {t.form.notConfigured}
       </div>
     )
   }
@@ -195,7 +196,7 @@ export function SignupForm() {
       ref={formRef}
       noValidate
       onSubmit={onSubmit}
-      aria-label="Join the Ellivia waitlist"
+      aria-label={t.form.label}
       aria-busy={submitting}
       className="w-full"
     >
@@ -203,10 +204,10 @@ export function SignupForm() {
         <TextField
           inputRef={refs.name}
           id={ids.name}
-          label="Name"
+          label={t.form.name}
           name="name"
           autoComplete="name"
-          placeholder="Your name"
+          placeholder={t.form.namePlaceholder}
           maxLength={120}
           value={values.name}
           error={errors.name}
@@ -216,12 +217,12 @@ export function SignupForm() {
         <TextField
           inputRef={refs.email}
           id={ids.email}
-          label="Email"
+          label={t.form.email}
           name="email"
           type="email"
           inputMode="email"
           autoComplete="email"
-          placeholder="you@example.com"
+          placeholder={t.form.emailPlaceholder}
           maxLength={254}
           value={values.email}
           error={errors.email}
@@ -249,21 +250,20 @@ export function SignupForm() {
           className="mt-0.5 size-5 shrink-0 cursor-pointer rounded-md accent-ink"
         />
         <label htmlFor={ids.consent} className="cursor-pointer text-left text-[15px] leading-snug text-copy">
-          Email me when Ellivia launches. My name and email will only be used for Ellivia launch updates, and I can
-          ask to be removed at any time.{' '}
-          <a href={privacyHref} className="font-medium text-link underline underline-offset-2 hover:text-ink">
-            Privacy Policy
+          {t.form.consent}{' '}
+          <a href={withLang(privacyHref, lang)} className="font-medium text-link underline underline-offset-2 hover:text-ink">
+            {t.form.privacy}
           </a>
         </label>
       </div>
       {errors.consent && <FieldError id={ids.consentError}>{errors.consent}</FieldError>}
 
       <div className="mt-4">
-        <TurnstileWidget resetKey={resetKey} onToken={handleToken} onExpire={handleExpire} onError={handleCaptchaError} />
+        <TurnstileWidget key={lang} language={lang} resetKey={resetKey} onToken={handleToken} onExpire={handleExpire} onError={handleCaptchaError} />
         {errors.captcha && <FieldError id={ids.captchaError}>{errors.captcha}</FieldError>}
         {awaitingCaptcha && !token && !errors.captcha && (
           <p className="mt-2 text-sm text-copy" role="status">
-            Finishing the security check. Your signup will continue automatically.
+            {t.form.awaiting}
           </p>
         )}
       </div>
@@ -285,16 +285,16 @@ export function SignupForm() {
         {submitting ? (
           <>
             <Loader2 className="size-5 animate-spin" aria-hidden="true" />
-            <span>Joining…</span>
+            <span>{t.form.joining}</span>
           </>
         ) : (
-          <span>Join the Free Waitlist</span>
+          <span>{t.form.submit}</span>
         )}
       </button>
 
       <p id={ids.hint} className="mt-4 flex items-center gap-2 text-sm text-muted">
         <Lock className="size-4 shrink-0" aria-hidden="true" />
-        Free to join. Never upload bills or medical information here.
+        {t.form.hint}
       </p>
     </form>
   )
@@ -381,8 +381,9 @@ function SignupSuccess({
   firstName: string
   email: string
 }) {
+  const { t, lang } = useLang()
   const [copied, setCopied] = useState(false)
-  const shareUrl = `${window.location.origin}${config.baseUrl}`
+  const shareUrl = `${window.location.origin}${withLang(config.baseUrl, lang)}`
   const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function'
 
   async function share() {
@@ -390,7 +391,7 @@ function SignupSuccess({
       if (canShare) {
         await navigator.share({
           title: 'Ellivia',
-          text: 'Ellivia is a free iOS app (coming soon) to help families explore hospital financial assistance.',
+          text: t.form.shareText,
           url: shareUrl,
         })
         return
@@ -414,26 +415,27 @@ function SignupSuccess({
         </span>
         <div className="min-w-0">
           <h3 ref={headingRef} id={headingId} tabIndex={-1} className="text-xl font-semibold tracking-tight text-ink focus:outline-none">
-            You’re on the list, {firstName}.
+            {t.form.successTitle(firstName)}
           </h3>
           <p className="mt-1.5 text-[15px] leading-relaxed text-copy">
-            We’ll send Ellivia launch updates to <strong className="break-all font-semibold text-ink">{email}</strong>.
-            If this address was already on the waitlist, nothing changes and you won’t get duplicate messages.
+            {t.form.successBefore}
+            <strong className="break-all font-semibold text-ink">{email}</strong>
+            {t.form.successAfter}
           </p>
         </div>
       </div>
       <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-success/10 pt-5">
-        <p className="text-[15px] text-copy">Know someone who could use Ellivia?</p>
+        <p className="text-[15px] text-copy">{t.form.shareAsk}</p>
         <button
           type="button"
           onClick={share}
           className="inline-flex h-10 items-center gap-2 rounded-full border border-line bg-white px-4 text-[15px] font-medium text-ink shadow-soft transition hover:border-baby-2 active:scale-[0.98]"
         >
           {canShare ? <Share2 className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}
-          {copied ? 'Link copied' : canShare ? 'Share Ellivia' : 'Copy link'}
+          {copied ? t.form.copied : canShare ? t.form.share : t.form.copy}
         </button>
         <span className="sr-only" role="status">
-          {copied ? 'Link copied to clipboard' : ''}
+          {copied ? t.form.copiedSr : ''}
         </span>
       </div>
     </section>
