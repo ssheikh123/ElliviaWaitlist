@@ -20,7 +20,7 @@ export default function PrivacyPage() {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-line bg-azure/90 pt-[env(safe-area-inset-top)] backdrop-blur">
-        <div className="mx-auto flex h-[72px] max-w-3xl items-center justify-between gap-2 px-4 sm:h-[88px] sm:px-6">
+        <div className="mx-auto flex h-[76px] max-w-3xl items-center justify-between gap-2 px-4 sm:h-[96px] sm:px-6">
           <a href={home} aria-label={t.nav.home} className="shrink-0 rounded-xl">
             <Wordmark large />
           </a>

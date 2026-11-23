@@ -7,8 +7,8 @@ export function LogoMark({ className = 'size-8' }: { className?: string }) {
       src={logoUrl}
       alt=""
       aria-hidden="true"
-      width={56}
-      height={56}
+      width={64}
+      height={64}
       decoding="async"
       className={`shrink-0 rounded-[28%] object-cover ${className}`}
     />
@@ -18,7 +18,7 @@ export function LogoMark({ className = 'size-8' }: { className?: string }) {
 export function Wordmark({ className = '', large = false }: { className?: string; large?: boolean }) {
   return (
     <span className={`inline-flex items-center text-ink ${large ? 'gap-3' : 'gap-2.5'} ${className}`}>
-      <LogoMark className={large ? 'size-11 sm:size-14' : 'size-10'} />
+      <LogoMark className={large ? 'size-12 sm:size-16' : 'size-12'} />
       <span className={`font-display tracking-[-0.005em] ${large ? 'text-[26px] sm:text-[32px]' : 'text-[24px]'}`}>
         Ellivia
       </span>

@@ -90,7 +90,7 @@ export function Nav() {
     <header className="sticky top-0 z-40 border-b border-line/80 bg-azure/85 pt-[env(safe-area-inset-top)] backdrop-blur-xl backdrop-saturate-150">
       <nav
         aria-label={t.nav.main}
-        className="mx-auto flex h-[72px] max-w-6xl items-center justify-between gap-2 px-4 sm:h-[88px] sm:gap-3 sm:px-6"
+        className="mx-auto flex h-[76px] max-w-6xl items-center justify-between gap-2 px-4 sm:h-[96px] sm:gap-3 sm:px-6"
       >
         <div className="flex min-w-0 items-center gap-4">
           <a
@@ -98,7 +98,7 @@ export function Nav() {
             className="inline-flex shrink-0 items-center gap-2.5 rounded-xl text-ink sm:gap-3"
             aria-label={t.nav.home}
           >
-            <LogoMark className="size-11 sm:size-14" />
+            <LogoMark className="size-12 sm:size-16" />
             <span className="font-display text-[27px] tracking-[-0.005em] sm:text-[33px]" aria-hidden="true">
               Ellivia
             </span>
