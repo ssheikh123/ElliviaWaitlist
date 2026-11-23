@@ -14,6 +14,8 @@ export default defineConfig(({ command }) => ({
   build: {
     target: 'es2022',
     sourcemap: false,
+    // Never inline fonts as data: URIs; the Content-Security-Policy only allows fonts from 'self'.
+    assetsInlineLimit: (file) => (/\.(woff2?|ttf|otf)$/.test(file) ? false : undefined),
     rollupOptions: {
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
