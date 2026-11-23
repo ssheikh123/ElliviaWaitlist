@@ -19,7 +19,7 @@ export function Wordmark({ className = '', large = false }: { className?: string
   return (
     <span className={`inline-flex items-center text-ink ${large ? 'gap-3' : 'gap-2.5'} ${className}`}>
       <LogoMark className={large ? 'size-11 sm:size-14' : 'size-10'} />
-      <span className={`font-extrabold tracking-[-0.02em] ${large ? 'text-[26px] sm:text-[32px]' : 'text-[24px]'}`}>
+      <span className={`font-display font-semibold tracking-[-0.01em] ${large ? 'text-[26px] sm:text-[32px]' : 'text-[24px]'}`}>
         Ellivia
       </span>
     </span>

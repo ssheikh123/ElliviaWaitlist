@@ -8,7 +8,7 @@ export const PRIVACY_LAST_UPDATED_EN = 'November 16, 2026'
 export function PolicyEn() {
   return (
     <>
-      <h1 className="text-[36px] font-extrabold leading-tight tracking-[-0.03em] text-ink sm:text-[44px]">
+      <h1 className="text-[36px] font-semibold leading-tight tracking-[-0.015em] text-ink sm:text-[44px]">
         Ellivia Privacy Policy
       </h1>
       <p className="mt-3 text-muted">Effective date: {PRIVACY_LAST_UPDATED_EN}</p>

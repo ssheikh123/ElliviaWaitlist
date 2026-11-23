@@ -7,7 +7,7 @@ export const PUBLIC_URL = 'https://ssheikh123.github.io/ElliviaWaitlist/privacy/
 export function Part({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="mt-20 border-t border-line pt-12">
-      <h2 className="text-[28px] font-extrabold leading-tight tracking-[-0.02em] text-ink sm:text-[32px]">{title}</h2>
+      <h2 className="text-[28px] font-semibold leading-tight tracking-[-0.01em] text-ink sm:text-[32px]">{title}</h2>
       {children}
     </div>
   )

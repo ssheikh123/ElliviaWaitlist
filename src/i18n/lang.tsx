@@ -1,3 +1,4 @@
+import { flushSync } from 'react-dom'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { en, es, type Strings } from './strings.ts'
 
@@ -55,7 +56,13 @@ export function LangProvider({
   const t = DICTIONARIES[lang]
 
   const setLang = useCallback((next: Lang) => {
-    setLangState(next)
+    // Cross-fade the page between languages where the browser supports view transitions.
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (typeof document.startViewTransition === 'function' && !reduce) {
+      document.startViewTransition(() => flushSync(() => setLangState(next)))
+    } else {
+      setLangState(next)
+    }
     try {
       const url = new URL(window.location.href)
       if (next !== browserLang()) url.searchParams.set('lang', next)

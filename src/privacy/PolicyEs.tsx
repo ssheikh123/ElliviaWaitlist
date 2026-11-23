@@ -8,7 +8,7 @@ export const PRIVACY_LAST_UPDATED_ES = '16 de noviembre de 2026'
 export function PolicyEs() {
   return (
     <>
-      <h1 className="text-[36px] font-extrabold leading-tight tracking-[-0.03em] text-ink sm:text-[44px]">
+      <h1 className="text-[36px] font-semibold leading-tight tracking-[-0.015em] text-ink sm:text-[44px]">
         Política de privacidad de Ellivia
       </h1>
       <p className="mt-3 text-muted">Fecha de entrada en vigor: {PRIVACY_LAST_UPDATED_ES}</p>
