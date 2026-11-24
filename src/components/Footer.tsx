@@ -5,8 +5,8 @@ import { useLang, withLang } from '../i18n/lang.tsx'
 export function Footer() {
   const { t, lang } = useLang()
   return (
-    <footer className="bg-ink px-4 pb-[calc(3rem+env(safe-area-inset-bottom))] pt-16 text-white sm:px-6 sm:pt-20">
-      <div className="mx-auto max-w-6xl">
+    <footer className="bg-ink px-5 sm:px-8 lg:px-12 pb-[calc(3rem+env(safe-area-inset-bottom))] pt-16 text-white sm:pt-20">
+      <div className="mx-auto max-w-[1360px]">
         <div className="flex flex-col gap-10 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <span className="inline-flex rounded-2xl bg-azure px-3.5 py-2.5">

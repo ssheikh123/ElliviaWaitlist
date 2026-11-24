@@ -24,7 +24,7 @@ import { goToSignup } from '../lib/goToSignup.ts'
 import { LaunchPill } from './Nav.tsx'
 import { HeroBill } from './HeroBill.tsx'
 import { Reveal, Words } from './Reveal.tsx'
-import { privacyHref } from '../config.ts'
+import { config, privacyHref } from '../config.ts'
 import { useLang, withLang } from '../i18n/lang.tsx'
 
 const H2 = 'text-balance text-[34px] leading-[1.08] tracking-[-0.01em] sm:text-[50px]'
@@ -48,7 +48,7 @@ export function Hero() {
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-40 -left-24 size-[420px] rounded-full bg-mint/80 blur-3xl"
       />
-      <div className="relative mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-start gap-14 px-4 pb-20 pt-12 sm:px-6 sm:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 lg:pb-28 lg:pt-20">
+      <div className="relative mx-auto grid max-w-[1360px] grid-cols-[minmax(0,1fr)] items-start gap-14 px-5 sm:px-8 lg:px-12 pb-20 pt-12 sm:pt-16 lg:grid-cols-2 lg:gap-20 lg:pb-28 lg:pt-20">
         <div className="lg:pt-20">
           <div className="flex flex-wrap items-center gap-2">
             <p className="inline-flex max-w-full items-center gap-2 rounded-full bg-mint px-4 py-2 text-[15px] font-bold text-ink ring-1 ring-ink/10">
@@ -61,13 +61,13 @@ export function Hero() {
           {/* Words drift in one by one; the key replays it when the language changes. */}
           <h1 key={t.hero.titleA} id="hero-title" className="words-on-load mt-7 text-ink">
             <span
-              className="block max-w-[13ch] text-balance text-[44px] leading-[1.04] tracking-[-0.015em] sm:text-[62px] lg:text-[70px]"
+              className="block max-w-[13ch] text-balance text-[44px] leading-[1.04] tracking-[-0.015em] sm:text-[62px] lg:text-[72px] xl:text-[84px]"
               style={{ '--start': '150ms' } as CSSProperties}
             >
               <Words text={t.hero.titleA} />
             </span>{' '}
             <span
-              className="mt-4 block text-[28px] leading-[1.2] text-ink-2 sm:text-[38px] lg:text-[42px]"
+              className="mt-4 block text-[28px] leading-[1.2] text-ink-2 sm:text-[38px] lg:text-[42px] xl:text-[48px]"
               style={{ '--start': `${150 + 80 * (lineA + 1)}ms` } as CSSProperties}
             >
               <Words text={t.hero.titleB[0]} />{' '}
@@ -130,8 +130,8 @@ const stepStyle: { icon: LucideIcon; tint: string }[] = [
 export function HowItWorks() {
   const { t } = useLang()
   return (
-    <section aria-labelledby="how-title" id="how-it-works" className="bg-paper px-4 py-20 sm:px-6 sm:py-28">
-      <div className="mx-auto max-w-6xl">
+    <section aria-labelledby="how-title" id="how-it-works" className="bg-paper px-5 sm:px-8 lg:px-12 py-20 sm:py-28">
+      <div className="mx-auto max-w-[1360px]">
         <h2 id="how-title" className={`max-w-[18ch] ${H2}`}>
           {t.how.title}
         </h2>
@@ -179,20 +179,25 @@ const withIcons: LucideIcon[] = [ScanLine, ListChecks, CircleCheck]
 export function WhyEllivia() {
   const { t } = useLang()
   return (
-    <section aria-labelledby="why-title" id="why" className="px-4 py-20 sm:px-6 sm:py-28">
-      <div className="mx-auto max-w-5xl">
-        <h2 id="why-title" className={`max-w-[20ch] ${H2}`}>
-          {t.why.title}
-        </h2>
-        <p className="mt-6 max-w-2xl text-lg leading-[1.7] text-copy">{t.why.body}</p>
-
-        <div className="mt-12 space-y-6">
-          <Flow title={t.why.ownTitle} labels={t.why.own} icons={ownIcons} tone="plain" />
-          <Reveal variant="wipe">
-            <Flow title={t.why.withTitle} labels={t.why.with} icons={withIcons} tone="mint" />
-          </Reveal>
+    <section aria-labelledby="why-title" id="why" className="px-5 sm:px-8 lg:px-12 py-20 sm:py-28">
+      <div className="mx-auto grid max-w-[1360px] gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center lg:gap-16">
+        <div>
+          <h2 id="why-title" className={`max-w-[20ch] ${H2}`}>
+            {t.why.title}
+          </h2>
+          <p className="mt-6 max-w-xl text-lg leading-[1.7] text-copy">{t.why.body}</p>
+          <p className="mt-6 hidden max-w-md text-[14px] leading-relaxed text-muted lg:block">{t.why.note}</p>
         </div>
-        <p className="mt-7 text-[14px] leading-relaxed text-muted">{t.why.note}</p>
+
+        <div>
+          <div className="space-y-6">
+            <Flow title={t.why.ownTitle} labels={t.why.own} icons={ownIcons} tone="plain" />
+            <Reveal variant="wipe">
+              <Flow title={t.why.withTitle} labels={t.why.with} icons={withIcons} tone="mint" />
+            </Reveal>
+          </div>
+          <p className="mt-7 text-[14px] leading-relaxed text-muted lg:hidden">{t.why.note}</p>
+        </div>
       </div>
     </section>
   )
@@ -252,8 +257,8 @@ const promiseIcons: LucideIcon[] = [BellRing, ShieldCheck, Building2, Gavel]
 export function TrustPrivacy() {
   const { t, lang } = useLang()
   return (
-    <section aria-labelledby="trust-title" id="privacy" className="bg-sand/70 px-4 py-20 sm:px-6 sm:py-28">
-      <div className="mx-auto grid max-w-6xl items-start gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20">
+    <section aria-labelledby="trust-title" id="privacy" className="bg-sand/70 px-5 sm:px-8 lg:px-12 py-20 sm:py-28">
+      <div className="mx-auto grid max-w-[1360px] items-center gap-14 lg:grid-cols-2 lg:gap-24">
         <div>
           <h2 id="trust-title" className={`max-w-[16ch] ${H2}`}>
             {t.trust.title}
@@ -278,7 +283,7 @@ export function TrustPrivacy() {
         </div>
 
         {/* The receipt */}
-        <Reveal variant="print" className="mx-auto w-full max-w-md">
+        <Reveal variant="print" className="mx-auto w-full max-w-lg">
           <div className="rotate-1 drop-shadow-[0_24px_30px_rgb(23_63_42/0.18)]">
             <div className="receipt-paper receipt-edge bg-paper px-6 pb-12 pt-8 sm:px-9">
               <p className="text-center text-[16px] font-bold">{t.trust.receiptTitle}</p>
@@ -334,12 +339,20 @@ export function Faq() {
     },
   ]
   return (
-    <section id="faq" aria-labelledby="faq-title" className="px-4 py-20 sm:px-6 sm:py-28">
-      <div className="mx-auto max-w-3xl">
-        <h2 id="faq-title" className={H2}>
-          {t.faq.title}
-        </h2>
-        <div className="mt-10 divide-y-2 divide-dashed divide-line border-y-2 border-dashed border-line">
+    <section id="faq" aria-labelledby="faq-title" className="px-5 sm:px-8 lg:px-12 py-20 sm:py-28">
+      <div className="mx-auto grid max-w-[1360px] gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
+        <div className="lg:sticky lg:top-32 lg:self-start">
+          <h2 id="faq-title" className={`max-w-[12ch] ${H2}`}>
+            {t.faq.title}
+          </h2>
+          <p className="mt-5 text-[17px] leading-[1.7] text-copy">
+            {t.faq.more}{' '}
+            <a href={`mailto:${config.contactEmail}`} className="font-semibold text-link underline underline-offset-4 hover:text-ink">
+              {config.contactEmail}
+            </a>
+          </p>
+        </div>
+        <div className="divide-y-2 divide-dashed divide-line border-y-2 border-dashed border-line">
           {items.map((f) => (
             <FaqItem key={f.q} q={f.q}>
               {f.a}
@@ -370,13 +383,13 @@ function FaqItem({ q, children }: { q: string; children: ReactNode }) {
 export function FinalCta() {
   const { t } = useLang()
   return (
-    <section id="join" aria-labelledby="final-title" className="px-4 pb-20 sm:px-6 sm:pb-28">
-      <Reveal variant="stamp" className="relative mx-auto max-w-5xl overflow-hidden rounded-[40px] bg-mint px-5 py-16 sm:px-12 sm:py-20">
+    <section id="join" aria-labelledby="final-title" className="px-5 sm:px-8 lg:px-12 pb-20 sm:pb-28">
+      <Reveal variant="stamp" className="relative mx-auto max-w-[1360px] overflow-hidden rounded-[40px] bg-mint px-5 py-16 sm:px-12 sm:py-20 lg:px-16">
         <div aria-hidden="true" className="sky-grid absolute inset-0 opacity-70" />
         {/* postmark */}
         <div
           aria-hidden="true"
-          className="postmark absolute right-6 top-6 hidden size-28 rotate-12 place-items-center rounded-full border-[3px] border-dashed border-ink/35 text-center sm:grid"
+          className="postmark absolute right-6 top-6 hidden size-28 rotate-12 lg:bottom-14 lg:left-16 lg:right-auto lg:top-auto lg:size-32 place-items-center rounded-full border-[3px] border-dashed border-ink/35 text-center sm:grid"
         >
           <span className="text-[13px] font-bold leading-tight text-ink/70">
             {t.final.postmark[0]}
@@ -384,12 +397,14 @@ export function FinalCta() {
             {t.final.postmark[1]}
           </span>
         </div>
-        <div className="relative mx-auto max-w-xl text-center">
-          <h2 id="final-title" className={H2}>
-            {t.final.title}
-          </h2>
-          <p className="mx-auto mt-6 max-w-md text-lg leading-[1.7] text-ink">{t.final.body}</p>
-          <div className="mt-10 rounded-3xl bg-paper p-6 text-left shadow-paper sm:p-8">
+        <div className="relative mx-auto grid max-w-xl items-center gap-10 text-center lg:max-w-none lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 lg:text-left">
+          <div className="lg:pb-36">
+            <h2 id="final-title" className={`mx-auto max-w-[14ch] lg:mx-0 ${H2}`}>
+              {t.final.title}
+            </h2>
+            <p className="mx-auto mt-6 max-w-md text-lg leading-[1.7] text-ink lg:mx-0">{t.final.body}</p>
+          </div>
+          <div className="rounded-3xl bg-paper p-6 text-left shadow-paper sm:p-8">
             <SignupForm />
           </div>
         </div>

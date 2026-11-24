@@ -90,7 +90,7 @@ export function Nav() {
     <header className="sticky top-0 z-40 border-b border-line/80 bg-azure/85 pt-[env(safe-area-inset-top)] backdrop-blur-xl backdrop-saturate-150">
       <nav
         aria-label={t.nav.main}
-        className="mx-auto flex h-[76px] max-w-6xl items-center justify-between gap-2 px-4 sm:h-[96px] sm:gap-3 sm:px-6"
+        className="mx-auto flex h-[76px] max-w-[1360px] items-center justify-between gap-2 px-4 sm:h-[96px] sm:gap-3 sm:px-8 lg:px-12"
       >
         <div className="flex min-w-0 items-center gap-4">
           <a
@@ -145,7 +145,7 @@ export function Nav() {
       </nav>
 
       <div id={menuId} hidden={!open} className="border-t border-line/80 bg-azure/95 xl:hidden">
-        <ul className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
+        <ul className="mx-auto max-w-[1360px] px-4 py-3 sm:px-8 lg:px-12">
           {NAV_LINKS.map((l) => (
             <li key={l.href}>
               <a

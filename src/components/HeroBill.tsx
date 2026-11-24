@@ -49,7 +49,7 @@ export function HeroBill() {
   const saving = explained && estimate.percentOff > 0
 
   return (
-    <figure className="relative mx-auto w-full max-w-[500px] pt-2">
+    <figure className="relative mx-auto w-full max-w-[540px] pt-2">
       <div
         role="radiogroup"
         aria-label={t.bill.toggle}
